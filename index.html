@@ -3,145 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منظومة مدرسة الاستقلال - لوحة التحكم</title>
+    <title>منظومة مدرسة الاستقلال</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --danger: #e74c3c; --success: #27ae60; }
-        body { font-family: 'Tajawal', sans-serif; background-color: #f4f7f6; margin: 0; padding: 15px; color: var(--primary); }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { text-align: center; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #38bdf8; --danger: #ef4444; --success: #22c55e; }
+        body { font-family: 'Tajawal', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 10px; }
+        .container { max-width: 900px; margin: auto; }
+        .header { text-align: center; padding: 20px; background: var(--card); border-radius: 15px; border-bottom: 4px solid var(--accent); margin-bottom: 20px; }
         
-        /* تصميم المدخلات */
-        .admin-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; background: #eee; padding: 15px; border-radius: 8px; }
-        input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Tajawal'; font-size: 14px; }
-        .full-width { grid-column: span 2; }
+        /* نموذج الإدخال الفخم */
+        .admin-panel { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        input { background: #334155; border: 1px solid #475569; color: white; padding: 12px; border-radius: 8px; font-family: 'Tajawal'; font-size: 16px; }
+        input:focus { outline: none; border-color: var(--accent); }
+        .full-w { grid-column: span 2; }
         
-        button { cursor: pointer; border: none; border-radius: 5px; font-family: 'Tajawal'; font-weight: bold; transition: 0.3s; }
-        .btn-save { background: var(--success); color: white; padding: 12px; font-size: 16px; }
-        
-        /* تصميم البحث والجدول */
-        .search-box { width: 100%; padding: 12px; margin: 20px 0; border: 2px solid var(--accent); border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        .table-container { overflow-x: auto; }
+        button { cursor: pointer; border: none; border-radius: 8px; font-family: 'Tajawal'; font-weight: bold; transition: 0.3s; }
+        .btn-save { background: var(--accent); color: #0f172a; padding: 15px; width: 100%; font-size: 18px; margin-top: 15px; }
+        .btn-save:hover { opacity: 0.9; transform: scale(0.98); }
+
+        /* البحث والجدول */
+        .search-box { width: 100%; margin: 20px 0; border: 2px dashed var(--accent); background: transparent; color: var(--accent); text-align: center; }
+        .table-container { background: var(--card); border-radius: 15px; overflow-x: auto; padding: 10px; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 12px; text-align: center; border-bottom: 1px solid #ddd; }
-        th { background: var(--primary); color: white; }
-        
-        .btn-edit { background: var(--accent); color: white; padding: 5px 10px; margin: 2px; }
-        .btn-delete { background: var(--danger); color: white; padding: 5px 10px; margin: 2px; }
+        th { background: #334155; color: var(--accent); padding: 15px; }
+        td { padding: 15px; border-bottom: 1px solid #334155; text-align: center; }
+
+        .action-btns { display: flex; gap: 8px; justify-content: center; }
+        .btn-edit { background: var(--success); color: white; padding: 5px 12px; }
+        .btn-delete { background: var(--danger); color: white; padding: 5px 12px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>إدارة بيانات مدرسة الاستقلال</h2>
-
-    <div class="admin-form" id="entryForm">
-        <input type="hidden" id="studentKey">
-        <input type="text" id="name" class="full-width" placeholder="اسم الطالب الرباعي">
-        <input type="text" id="idNo" class="full-width" placeholder="الرقم الوطني / رقم القيد">
-        <input type="number" id="mathW" placeholder="رياضيات (أعمال)">
-        <input type="number" id="mathE" placeholder="رياضيات (امتحان)">
-        <input type="number" id="araW" placeholder="عربي (أعمال)">
-        <input type="number" id="araE" placeholder="عربي (امتحان)">
-        <button onclick="saveData()" class="btn-save full-width">حفظ البيانات</button>
+    <div class="header">
+        <h1>مدرسة الاستقلال للتعليم الحر</h1>
+        <p>لوحة التحكم في بيانات الطلاب والنتائج</p>
     </div>
 
-    <input type="text" id="search" class="search-box" onkeyup="searchTable()" placeholder="ابحث عن طالب بالاسم أو الرقم الوطني...">
+    <div class="admin-panel">
+        <input type="hidden" id="sKey">
+        <div class="grid-inputs">
+            <input type="text" id="sName" class="full-w" placeholder="اسم الطالب الرباعي">
+            <input type="text" id="sID" class="full-w" placeholder="الرقم الوطني / رقم القيد">
+            <input type="number" id="mw" placeholder="رياضيات (أعمال)">
+            <input type="number" id="me" placeholder="رياضيات (امتحان)">
+            <input type="number" id="aw" placeholder="عربي (أعمال)">
+            <input type="number" id="ae" placeholder="عربي (امتحان)">
+        </div>
+        <button onclick="handleSave()" class="btn-save">حفظ وتحديث البيانات 💾</button>
+    </div>
+
+    <input type="text" id="search" class="search-box" onkeyup="doSearch()" placeholder="🔍 ابحث عن طالب لتعديله أو حذفه...">
 
     <div class="table-container">
         <table>
             <thead>
                 <tr>
-                    <th>الاسم</th>
+                    <th>اسم الطالب</th>
                     <th>الرقم الوطني</th>
-                    <th>الإجراءات</th>
+                    <th>إجراءات</th>
                 </tr>
             </thead>
-            <tbody id="studentsTable"></tbody>
+            <tbody id="resTable"></tbody>
         </table>
     </div>
 </div>
 
 <script>
-    // تكوين Firebase - تأكد من وضع رابط قاعدة بياناتك هنا
-    const firebaseConfig = {
-        databaseURL: "https://istiqlal-school-default-rtdb.firebaseio.com/" 
-    };
+    // تكوين Firebase
+    const firebaseConfig = { databaseURL: "https://istiqlal-school-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref("students");
 
-    // دالة الحفظ (إضافة جديدة أو تحديث موجود)
-    function saveData() {
-        const key = document.getElementById('studentKey').value;
+    // دالة الحفظ والتحديث
+    function handleSave() {
+        const key = document.getElementById('sKey').value;
         const data = {
-            name: document.getElementById('name').value,
-            id: document.getElementById('idNo').value,
-            mathW: document.getElementById('mathW').value,
-            mathE: document.getElementById('mathE').value,
-            araW: document.getElementById('araW').value,
-            araE: document.getElementById('araE').value
+            name: document.getElementById('sName').value,
+            id: document.getElementById('sID').value,
+            mathW: document.getElementById('mw').value,
+            mathE: document.getElementById('me').value,
+            araW: document.getElementById('aw').value,
+            araE: document.getElementById('ae').value
         };
 
         if(key) {
-            db.child(key).update(data).then(() => { alert("تم التحديث بنجاح"); clearFields(); });
+            db.child(key).update(data).then(() => { alert("تم تحديث بيانات الطالب ✅"); reset(); });
         } else {
-            db.push(data).then(() => { alert("تمت الإضافة بنجاح"); clearFields(); });
+            db.push(data).then(() => { alert("تمت إضافة الطالب للمنظومة 🆕"); reset(); });
         }
     }
 
-    // عرض البيانات في الجدول
+    // جلب البيانات وعرضها
     db.on('value', (snapshot) => {
-        const tbody = document.getElementById('studentsTable');
-        tbody.innerHTML = "";
+        const root = document.getElementById('resTable');
+        root.innerHTML = "";
         snapshot.forEach((child) => {
             const s = child.val();
             const k = child.key;
-            tbody.innerHTML += `
+            root.innerHTML += `
                 <tr>
                     <td>${s.name}</td>
                     <td>${s.id}</td>
-                    <td>
-                        <button class="btn-edit" onclick="fillForm('${k}','${s.name}','${s.id}','${s.mathW}','${s.mathE}','${s.araW}','${s.araE}')">تعديل</button>
-                        <button class="btn-delete" onclick="deleteStudent('${k}')">حذف</button>
+                    <td class="action-btns">
+                        <button class="btn-edit" onclick="setEdit('${k}','${s.name}','${s.id}','${s.mathW}','${s.mathE}','${s.araW}','${s.araE}')">تعديل</button>
+                        <button class="btn-delete" onclick="setDelete('${k}')">حذف</button>
                     </td>
                 </tr>`;
         });
     });
 
-    // ملء النموذج للتعديل
-    function fillForm(k, n, id, mw, me, aw, ae) {
-        document.getElementById('studentKey').value = k;
-        document.getElementById('name').value = n;
-        document.getElementById('idNo').value = id;
-        document.getElementById('mathW').value = mw;
-        document.getElementById('mathE').value = me;
-        document.getElementById('araW').value = aw;
-        document.getElementById('araE').value = ae;
-        window.scrollTo(0,0);
+    function setEdit(k, n, id, mw, me, aw, ae) {
+        document.getElementById('sKey').value = k;
+        document.getElementById('sName').value = n;
+        document.getElementById('sID').value = id;
+        document.getElementById('mw').value = mw;
+        document.getElementById('me').value = me;
+        document.getElementById('aw').value = aw;
+        document.getElementById('ae').value = ae;
+        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-    // حذف الطالب
-    function deleteStudent(k) {
-        if(confirm("هل أنت متأكد من حذف هذا الطالب؟")) {
+    function setDelete(k) {
+        if(confirm("تحذير: هل أنت متأكد من حذف هذا الطالب من قاعدة البيانات؟")) {
             db.child(k).remove();
         }
     }
 
-    // دالة البحث
-    function searchTable() {
-        let filter = document.getElementById("search").value.toUpperCase();
-        let tr = document.getElementById("studentsTable").getElementsByTagName("tr");
-        for (let i = 0; i < tr.length; i++) {
-            tr[i].style.display = tr[i].innerText.toUpperCase().includes(filter) ? "" : "none";
+    function doSearch() {
+        let val = document.getElementById("search").value.toUpperCase();
+        let rows = document.getElementById("resTable").getElementsByTagName("tr");
+        for (let i = 0; i < rows.length; i++) {
+            rows[i].style.display = rows[i].innerText.toUpperCase().includes(val) ? "" : "none";
         }
     }
 
-    function clearFields() {
-        document.getElementById('studentKey').value = "";
+    function reset() {
+        document.getElementById('sKey').value = "";
         document.querySelectorAll('input').forEach(i => i.value = "");
     }
 </script>
 </body>
 </html>
+
