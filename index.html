@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منظومة مدرسة الاستقلال | الإصدار النهائي</title>
+    <title>منظومة مدرسة الاستقلال | الإصدار الاحترافي</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -24,40 +24,51 @@
         }
 
         * { box-sizing: border-box; font-family: 'Cairo', sans-serif; transition: 0.2s ease; }
-        body { margin: 0; background: var(--bg); color: var(--text); padding: 10px; min-height: 100vh; }
+        body { margin: 0; background: var(--bg); color: var(--text); padding: 5px; min-height: 100vh; }
 
-        .container { max-width: 800px; margin: 20px auto; }
-        .main-card { background: var(--card); border-radius: 25px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .container { max-width: 800px; margin: 15px auto; }
+        .main-card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border); }
 
-        .school-header { text-align: center; margin-bottom: 30px; }
-        .school-icon { font-size: 50px; color: var(--primary); margin-bottom: 10px; cursor: pointer; }
+        .school-header { text-align: center; margin-bottom: 25px; }
+        .school-icon { font-size: 45px; color: var(--primary); margin-bottom: 8px; cursor: pointer; }
 
-        .search-container { max-width: 500px; margin: 0 auto; text-align: center; }
+        .search-container { max-width: 450px; margin: 0 auto; text-align: center; }
         input, select { 
-            width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--border); 
-            background: #f8fafc; color: var(--text); outline: none; font-size: 16px; margin-bottom: 15px; text-align: center;
+            width: 100%; padding: 12px; border-radius: 12px; border: 2px solid var(--border); 
+            background: #f8fafc; color: var(--text); outline: none; font-size: 16px; margin-bottom: 12px; text-align: center;
         }
         
-        .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 17px; }
+        .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 17px; }
         .btn-primary { background: var(--primary); color: white; }
 
-        /* تعديلات الشهادة لمنع تداخل الحروف */
+        /* تعديلات الشهادة الكبرى لمنع القطع */
         #resultView { 
-            display: none; margin-top: 30px; padding: 20px; border: 4px solid var(--primary); border-radius: 15px; background: #fff;
+            display: none; margin-top: 20px; padding: 15px; border: 3px solid var(--primary); border-radius: 12px; background: #fff;
         }
-        .res-table { width: 100%; border-collapse: collapse; margin-bottom: 0; table-layout: fixed; }
-        .res-table th { background: var(--primary); color: white; padding: 8px 4px; font-size: 13px; border: 1px solid #ddd; }
-        .res-table td { padding: 12px 4px; border: 1px solid #eee; text-align: center; font-weight: 700; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .sub-name { text-align: right !important; color: var(--primary); background: #f9fafb; width: 35%; white-space: normal !important; line-height: 1.2; }
+        .res-table { width: 100%; border-collapse: collapse; table-layout: auto; }
+        .res-table th { background: var(--primary); color: white; padding: 6px 2px; font-size: 11px; border: 1px solid #ddd; }
+        .res-table td { padding: 10px 2px; border: 1px solid #eee; text-align: center; font-weight: 700; font-size: 14px; }
+        .sub-name { text-align: right !important; color: var(--primary); background: #f9fafb; font-size: 13px !important; padding-right: 5px !important; }
 
-        /* المجموع داخل الجدول */
-        .total-row { background: #f1f5f9; }
-        .total-row td { border: 2px solid var(--primary); color: var(--primary); font-size: 16px; padding: 15px 5px; }
+        /* منطقة المجموع والنسبة - عرض طولي لمنع القطع */
+        .total-section { margin-top: 0px; border: 2px solid var(--primary); border-top: none; background: #f8fafc; border-radius: 0 0 10px 10px; }
+        .total-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 10px 15px; border-bottom: 1px solid #e2e8f0;
+        }
+        .total-item:last-child { border-bottom: none; }
+        .total-label { font-weight: 800; color: #475569; font-size: 14px; }
+        .total-val { font-weight: 900; color: var(--primary); font-size: 18px; }
 
-        /* بوابة المطور (كما هي تماماً) */
+        .fail-box { 
+            background: #fff1f2; border: 2px solid var(--danger); color: var(--danger); 
+            padding: 12px; border-radius: 10px; margin-top: 15px; text-align: center;
+        }
+
+        /* بوابة المطور (ممنوع اللمس) */
         #adminPortal { display: none; }
         .admin-dashboard { background: #f8fafc; border-radius: 20px; padding: 15px; border: 1px solid var(--border); }
-        .admin-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); }
+        .admin-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
         .subject-entry-card { background: white; border: 2px solid #e2e8f0; border-radius: 18px; padding: 20px; margin-bottom: 20px; position: relative; }
         .subject-entry-card .m-name { font-size: 18px; font-weight: 900; color: var(--primary); border: none; border-bottom: 2px solid #eee; width: 100%; text-align: right; margin-bottom: 15px; }
         .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -65,12 +76,19 @@
         .score-item input { margin-bottom: 0; padding: 12px; font-size: 18px; font-weight: 700; border: 2px solid #cbd5e1; border-radius: 10px; }
         .remove-btn { position: absolute; left: 15px; top: 15px; color: var(--danger); font-size: 20px; }
 
-        @media print {
-            .btn, .search-container, footer, #adminPortal, .school-header { display: none !important; }
-            #resultView { display: block !important; border: 2px solid #000; }
+        /* تذييل المطور الاحترافي */
+        .dev-badge {
+            text-align: center; margin-top: 40px; padding: 15px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white; border-radius: 15px; font-weight: 900; font-size: 14px;
+            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+            border: 2px solid #3b82f6;
         }
 
-        .dev-footer { text-align: center; padding: 30px; color: var(--primary); font-weight: 900; font-size: 16px; border-top: 1px solid #ddd; margin-top: 20px; }
+        @media print {
+            .btn, .search-container, .dev-badge, #adminPortal, .school-header { display: none !important; }
+            #resultView { display: block !important; border: 2px solid #000; width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -79,46 +97,53 @@
     <div class="main-card">
         <div class="school-header">
             <div class="school-icon" ondblclick="enterAdmin()"><i class="fas fa-school"></i></div>
-            <h1 style="margin: 0; font-size: 30px; font-weight: 900; color: var(--primary);">مدرسة الاستقلال</h1>
-            <p style="color: #64748b; font-weight: 700;">منظومة النتائج والشهادات</p>
+            <h1 style="margin: 0; font-size: 28px; font-weight: 900; color: var(--primary);">مدرسة الاستقلال</h1>
+            <p style="color: #64748b; font-weight: 700; font-size: 14px;">نتائج الامتحانات للعام الدراسي 2026</p>
         </div>
 
         <div class="search-container">
-            <label>الرقم الوطني للطالبة</label>
-            <input type="number" id="searchID" placeholder="أدخل الرقم الوطني...">
-            <button class="btn btn-primary" onclick="loadResult()"><i class="fas fa-file-signature"></i> عرض الشهادة</button>
+            <input type="number" id="searchID" placeholder="أدخل الرقم الوطني للطالبة...">
+            <button class="btn btn-primary" onclick="loadResult()"><i class="fas fa-search"></i> استخراج النتيجة</button>
         </div>
 
         <div id="resultView">
-            <div style="text-align: center; margin-bottom: 15px;">
-                <h2 id="outName" style="margin: 0; font-size: 22px; color: #000;"></h2>
-                <div id="outYear" style="color: var(--accent); font-weight: 800; font-size: 16px;"></div>
+            <div style="text-align: center; margin-bottom: 12px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+                <h2 id="outName" style="margin: 0; font-size: 20px;"></h2>
+                <div id="outYear" style="color: var(--accent); font-weight: 800; font-size: 15px;"></div>
             </div>
             
             <table class="res-table">
                 <thead>
                     <tr>
-                        <th style="width: 35%;">المادة</th>
-                        <th>أعمال</th>
-                        <th>من</th>
-                        <th>نهائي</th>
-                        <th>من</th>
-                        <th>المجموع</th>
+                        <th style="width: 30%;">المادة</th>
+                        <th>أعمال</th><th>من</th><th>نهائي</th><th>من</th><th>المجموع</th>
                     </tr>
                 </thead>
                 <tbody id="resTbody"></tbody>
-                <tfoot>
-                    <tr class="total-row">
-                        <td colspan="3">المجموع الكلي: <span id="outTotalSum"></span></td>
-                        <td colspan="2">النسبة: <span id="outPercent"></span></td>
-                        <td><span id="outGrade"></span></td>
-                    </tr>
-                </tfoot>
             </table>
             
-            <div id="failMissions" style="display:none; background:var(--danger); color:white; padding:10px; border-radius:8px; margin-top:15px; text-align:center; font-weight:bold; font-size:14px;"></div>
+            <div class="total-section">
+                <div class="total-item">
+                    <span class="total-label">المجموع الكلي:</span>
+                    <span class="total-val" id="outTotalSum"></span>
+                </div>
+                <div class="total-item">
+                    <span class="total-label">النسبة المئوية:</span>
+                    <span class="total-val" id="outPercent"></span>
+                </div>
+                <div class="total-item">
+                    <span class="total-label">التقدير العام:</span>
+                    <span class="total-val" id="outGrade"></span>
+                </div>
+            </div>
             
-            <button class="btn" style="background: #475569; color: white; margin-top: 20px;" onclick="window.print()"><i class="fas fa-print"></i> طباعة كشف الدرجات</button>
+            <div id="failMissions" class="fail-box" style="display:none;"></div>
+            
+            <button class="btn" style="background: #475569; color: white; margin-top: 20px;" onclick="window.print()"><i class="fas fa-print"></i> طباعة الشهادة</button>
+        </div>
+        
+        <div class="dev-badge">
+            <i class="fas fa-code"></i> تم تطويره بواسطة عماد الدين نجم
         </div>
     </div>
 </div>
@@ -130,8 +155,8 @@
             <div class="admin-card">
                 <label>تعديل طالبة سابقة</label>
                 <div style="display: flex; gap: 8px;">
-                    <input type="number" id="editID" placeholder="الرقم الوطني..." style="margin-bottom:0;">
-                    <button onclick="fetchForEdit()" style="background:var(--primary); color:white; border:none; padding:0 20px; border-radius:10px; cursor:pointer;">جلب</button>
+                    <input type="number" id="editID" placeholder="الرقم الوطني...">
+                    <button onclick="fetchForEdit()" style="background:var(--primary); color:white; border:none; padding:0 15px; border-radius:10px;">جلب</button>
                 </div>
             </div>
             <div class="admin-card">
@@ -148,12 +173,10 @@
             <div id="subjectsContainer"></div>
             <button onclick="addNewSubject()" class="btn" style="background:#e2e8f0; color:#475569; margin-bottom:15px;">+ إضافة مادة</button>
             <button class="btn" style="background: var(--success); color:white;" onclick="saveToFirebase()">حفظ البيانات</button>
-            <button onclick="location.reload()" class="btn" style="background:none; color:#64748b;">إلغاء</button>
+            <button onclick="location.reload()" class="btn" style="background:none;">خروج</button>
         </div>
     </div>
 </div>
-
-<div class="dev-footer">تم تطويره بواسطة عماد الدين نجم</div>
 
 <script>
     const firebaseConfig = {
@@ -175,13 +198,12 @@
 
     function addNewSubject(v={n:'',wg:'',wm:40,eg:'',em:60}) {
         const div = document.createElement('div'); div.className = 'subject-entry-card';
-        div.innerHTML = `
-            <i class="fas fa-trash-alt remove-btn" onclick="this.parentElement.remove()"></i>
-            <input type="text" class="m-name" value="${v.n}" placeholder="اسم المادة">
+        div.innerHTML = `<i class="fas fa-trash-alt remove-btn" onclick="this.parentElement.remove()"></i>
+            <input type="text" class="m-name" value="${v.n}">
             <div class="score-grid">
-                <div class="score-item"><label>درجة الأعمال</label><input type="number" class="m-w-got" value="${v.wg}"></div>
+                <div class="score-item"><label>أعمال</label><input type="number" class="m-w-got" value="${v.wg}"></div>
                 <div class="score-item"><label>من</label><input type="number" class="m-w-max" value="${v.wm}"></div>
-                <div class="score-item"><label>درجة النهائي</label><input type="number" class="m-e-got" value="${v.eg}"></div>
+                <div class="score-item"><label>نهائي</label><input type="number" class="m-e-got" value="${v.eg}"></div>
                 <div class="score-item"><label>من</label><input type="number" class="m-e-max" value="${v.em}"></div>
             </div>`;
         document.getElementById('subjectsContainer').appendChild(div);
@@ -228,7 +250,7 @@
         document.getElementById('outName').innerText = data.name;
         document.getElementById('outYear').innerText = "الصف: " + data.year;
         document.getElementById('outPercent').innerText = data.percent + "%";
-        document.getElementById('outTotalSum').innerText = data.totalGot + " / " + data.totalMax;
+        document.getElementById('outTotalSum').innerText = data.totalGot + " من " + data.totalMax;
         let h=""; let failed=[]; let hasFail=false;
         for(let k in data.subjects){
             const s=data.subjects[k]; const isFail = s.sum < (s.max/2);
@@ -238,9 +260,9 @@
         document.getElementById('resTbody').innerHTML=h;
         const gBox=document.getElementById('outGrade');
         if(hasFail){
-            gBox.innerText = "دور ثانٍ"; gBox.style.color = "red";
+            gBox.innerText = "لم توفق"; gBox.style.color = "red";
             document.getElementById('failMissions').style.display='block';
-            document.getElementById('failMissions').innerText = "لم توفق في: " + failed.join(' - ');
+            document.getElementById('failMissions').innerHTML = "<strong>المواد التي لم توفق فيها:</strong><br>" + failed.join(' - ');
         } else {
             let p=parseFloat(data.percent);
             let g = p>=85?"ممتاز":p>=75?"جيد جداً":p>=65?"جيد":p>=50?"مقبول":"ضعيف";
