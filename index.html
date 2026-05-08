@@ -93,6 +93,7 @@
 <div class="container" id="searchSection">
     <div class="main-card">
         <div class="school-header" style="text-align:center; margin-bottom:20px;">
+            
             <div class="school-icon" style="font-size:40px; color:var(--primary); cursor:pointer;" ondblclick="enterAdmin()"><i class="fas fa-school"></i></div>
             <h1 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--primary);">منظومة نتائج الاستقلال</h1>
             <p style="color: #64748b; font-weight: 700; font-size: 14px;">نتائج الامتحانات 2026</p>
@@ -365,6 +366,32 @@
             else { gradeEl.innerText = "ضعيف"; gradeEl.className = "grade-fail"; }
         }
     }
+    // دالة الدخول بالبصمة
+async function loginWithBiometrics() {
+    // التأكد من أن المتصفح يدعم البصمة
+    if (window.PublicKeyCredential) {
+        try {
+            // طلب التحقق من هوية صاحب الهاتف
+            const credential = await navigator.credentials.get({
+                publicKey: {
+                    challenge: new Uint8Array([1, 2, 3, 4]), // تحدي عشوائي
+                    userVerification: "required"
+                }
+            });
+
+            if (credential) {
+                // إذا نجحت البصمة، افتح بوابة المطور فوراً
+                document.getElementById('searchSection').style.display = 'none';
+                document.getElementById('adminPortal').style.display = 'block';
+            }
+        } catch (err) {
+            console.log("تم إلغاء البصمة أو فشلت، استخدم الكود السري بالضغط مرتين");
+        }
+    } else {
+        alert("متصفحك لا يدعم البصمة، اضغط مرتين للدخول بالكود");
+    }
+}
+
 </script>
 </body>
 </html>
