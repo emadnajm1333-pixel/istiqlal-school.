@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منظومة مدرسة الاستقلال | الإصدار الاحترافي</title>
+    <title>منظومة مدرسة الاستقلال | الإصدار النهائي</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -32,7 +32,10 @@
         .school-header { text-align: center; margin-bottom: 25px; }
         .school-icon { font-size: 45px; color: var(--primary); margin-bottom: 8px; cursor: pointer; }
 
-        .search-container { max-width: 450px; margin: 0 auto; text-align: center; }
+        /* تعديل مكان الرقم الوطني */
+        .search-container { max-width: 450px; margin: 0 auto; text-align: right; }
+        .search-label { display: block; font-weight: 800; color: var(--text); margin-bottom: 8px; font-size: 16px; padding-right: 5px; }
+        
         input, select { 
             width: 100%; padding: 12px; border-radius: 12px; border: 2px solid var(--border); 
             background: #f8fafc; color: var(--text); outline: none; font-size: 16px; margin-bottom: 12px; text-align: center;
@@ -41,31 +44,20 @@
         .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 17px; }
         .btn-primary { background: var(--primary); color: white; }
 
-        /* تعديلات الشهادة الكبرى لمنع القطع */
-        #resultView { 
-            display: none; margin-top: 20px; padding: 15px; border: 3px solid var(--primary); border-radius: 12px; background: #fff;
-        }
-        .res-table { width: 100%; border-collapse: collapse; table-layout: auto; }
+        /* الشهادة (كما هي ممتازة) */
+        #resultView { display: none; margin-top: 20px; padding: 15px; border: 3px solid var(--primary); border-radius: 12px; background: #fff; }
+        .res-table { width: 100%; border-collapse: collapse; }
         .res-table th { background: var(--primary); color: white; padding: 6px 2px; font-size: 11px; border: 1px solid #ddd; }
         .res-table td { padding: 10px 2px; border: 1px solid #eee; text-align: center; font-weight: 700; font-size: 14px; }
         .sub-name { text-align: right !important; color: var(--primary); background: #f9fafb; font-size: 13px !important; padding-right: 5px !important; }
 
-        /* منطقة المجموع والنسبة - عرض طولي لمنع القطع */
         .total-section { margin-top: 0px; border: 2px solid var(--primary); border-top: none; background: #f8fafc; border-radius: 0 0 10px 10px; }
-        .total-item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 10px 15px; border-bottom: 1px solid #e2e8f0;
-        }
-        .total-item:last-child { border-bottom: none; }
-        .total-label { font-weight: 800; color: #475569; font-size: 14px; }
+        .total-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid #e2e8f0; }
         .total-val { font-weight: 900; color: var(--primary); font-size: 18px; }
 
-        .fail-box { 
-            background: #fff1f2; border: 2px solid var(--danger); color: var(--danger); 
-            padding: 12px; border-radius: 10px; margin-top: 15px; text-align: center;
-        }
+        .fail-box { background: #fff1f2; border: 2px solid var(--danger); color: var(--danger); padding: 12px; border-radius: 10px; margin-top: 15px; text-align: center; }
 
-        /* بوابة المطور (ممنوع اللمس) */
+        /* بوابة المطور (كما هي ممتازة) */
         #adminPortal { display: none; }
         .admin-dashboard { background: #f8fafc; border-radius: 20px; padding: 15px; border: 1px solid var(--border); }
         .admin-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
@@ -76,18 +68,12 @@
         .score-item input { margin-bottom: 0; padding: 12px; font-size: 18px; font-weight: 700; border: 2px solid #cbd5e1; border-radius: 10px; }
         .remove-btn { position: absolute; left: 15px; top: 15px; color: var(--danger); font-size: 20px; }
 
-        /* تذييل المطور الاحترافي */
-        .dev-badge {
-            text-align: center; margin-top: 40px; padding: 15px;
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            color: white; border-radius: 15px; font-weight: 900; font-size: 14px;
-            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
-            border: 2px solid #3b82f6;
-        }
+        /* تذييل عادي بخط أسود */
+        .dev-footer-simple { text-align: center; margin-top: 30px; padding: 20px; color: #000; font-weight: 700; font-size: 15px; border-top: 1px solid #e2e8f0; }
 
         @media print {
-            .btn, .search-container, .dev-badge, #adminPortal, .school-header { display: none !important; }
-            #resultView { display: block !important; border: 2px solid #000; width: 100%; }
+            .btn, .search-container, .dev-footer-simple, #adminPortal, .school-header { display: none !important; }
+            #resultView { display: block !important; width: 100%; }
         }
     </style>
 </head>
@@ -102,7 +88,8 @@
         </div>
 
         <div class="search-container">
-            <input type="number" id="searchID" placeholder="أدخل الرقم الوطني للطالبة...">
+            <label class="search-label">الرقم الوطني للطالبة:</label>
+            <input type="number" id="searchID" placeholder="أدخل الرقم هنا...">
             <button class="btn btn-primary" onclick="loadResult()"><i class="fas fa-search"></i> استخراج النتيجة</button>
         </div>
 
@@ -123,18 +110,9 @@
             </table>
             
             <div class="total-section">
-                <div class="total-item">
-                    <span class="total-label">المجموع الكلي:</span>
-                    <span class="total-val" id="outTotalSum"></span>
-                </div>
-                <div class="total-item">
-                    <span class="total-label">النسبة المئوية:</span>
-                    <span class="total-val" id="outPercent"></span>
-                </div>
-                <div class="total-item">
-                    <span class="total-label">التقدير العام:</span>
-                    <span class="total-val" id="outGrade"></span>
-                </div>
+                <div class="total-item"><span class="total-label">المجموع الكلي:</span><span class="total-val" id="outTotalSum"></span></div>
+                <div class="total-item"><span class="total-label">النسبة المئوية:</span><span class="total-val" id="outPercent"></span></div>
+                <div class="total-item"><span class="total-label">التقدير العام:</span><span class="total-val" id="outGrade"></span></div>
             </div>
             
             <div id="failMissions" class="fail-box" style="display:none;"></div>
@@ -142,8 +120,8 @@
             <button class="btn" style="background: #475569; color: white; margin-top: 20px;" onclick="window.print()"><i class="fas fa-print"></i> طباعة الشهادة</button>
         </div>
         
-        <div class="dev-badge">
-            <i class="fas fa-code"></i> تم تطويره بواسطة عماد الدين نجم
+        <div class="dev-footer-simple">
+            تم تطويره بواسطة عماد الدين نجم
         </div>
     </div>
 </div>
