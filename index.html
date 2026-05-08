@@ -56,21 +56,16 @@
         
         #resultView { display: none; margin-top: 20px; padding: 10px; border-radius: 12px; background: #fff; }
         
-        /* تحسين الجدول لمنع تداخل الكلمات */
-        .res-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+                /* الكود الجديد المصلح للتداخل */
+        .res-table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid var(--border); }
         .res-table th { 
-            background: var(--primary); 
-            color: white; 
-            padding: 8px 1px; 
-            font-size: 10px; /* تصغير الخط قليلاً للعناوين */
-            border: 1px solid #fff;
-            line-height: 1.2;
-            word-wrap: break-word; /* كسر الكلمة إذا كانت طويلة */
+            background: var(--primary); color: white; padding: 6px 1px; font-size: 9px; border: 1px solid #fff;
+            line-height: 1.1; word-wrap: break-word; vertical-align: middle; height: 40px;
         }
-        .res-table th:first-child { width: 22%; } /* عمود المادة */
-        .res-table th:last-child { width: 15%; } /* عمود المجموع */
-        
-        .res-table td { padding: 12px 1px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; color: #000; font-size: 13px; }
+        .res-table th:first-child { width: 20%; } 
+        .res-table th:nth-child(3), .res-table th:nth-child(5) { width: 18%; font-size: 8.5px; } 
+        .res-table td { padding: 8px 1px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; color: #000; font-size: 12px; }
+
 
         .summary-box { margin-top: 0; border: 2px solid var(--primary); background: #f8fafc; border-radius: 0 0 10px 10px; }
         
@@ -79,6 +74,8 @@
         .grade-good { color: #92400e !important; background: #fef3c7; padding: 2px 10px; border-radius: 8px; border: 1px solid #d97706; }
         .grade-fail { color: #991b1b !important; background: #fee2e2; padding: 2px 10px; border-radius: 8px; border: 1px solid #ef4444; }
 
+        /* تنسيق شبكة الرصد */
+        .grid-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 5px; text-align: center; font-size: 11px; font-weight: bold; color: var(--primary); margin: 10px 0; }
         .bulk-student-box { border: 2px solid var(--primary); border-radius: 15px; padding: 15px; margin-bottom: 20px; background: #fff; }
         .bulk-row-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 5px; align-items: center; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
         .bulk-row-grid input { margin-bottom: 0; padding: 6px; font-size: 13px; border: 1px solid #cbd5e1; }
@@ -159,6 +156,7 @@
             <button class="tab-btn active" onclick="showTab('individualTab', this)">الرصد الفردي</button>
             <button class="tab-btn" onclick="showTab('bulkTab', this)">الرصد الجماعي</button>
         </div>
+
         <div id="individualTab" class="admin-section active">
             <div style="background:#f8fafc; padding:15px; border-radius:15px; border:1px solid #ddd;">
                 <input type="number" id="editID" placeholder="الرقم الوطني للتعديل...">
@@ -172,6 +170,10 @@
                         <option value="سابع">سابع</option><option value="ثامن">ثامن</option>
                     </select>
                 </div>
+                
+                <div class="grid-header">
+                    <div>المادة</div><div>أعمال</div><div>من</div><div>امتحان</div><div>من</div>
+                </div>
                 <div id="subjectsContainer"></div>
                 <button onclick="addNewSubject()" class="btn" style="background:#e2e8f0; color:#475569; margin-bottom:15px;">+ إضافة مادة</button>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -180,6 +182,7 @@
                 </div>
             </div>
         </div>
+
         <div id="bulkTab" class="admin-section">
              <select id="bulkSelectYear" onchange="loadBulkStudentsList()">
                 <option value="">-- اختر الصف --</option>
@@ -220,13 +223,13 @@
     function enterAdmin() { if(prompt("رمز المطور:") === "74742000") { document.getElementById('searchSection').style.display='none'; document.getElementById('adminPortal').style.display='block'; } }
 
     function addNewSubject(v={n:'',wg:'',wm:40,eg:'',em:60}) {
-        const div = document.createElement('div'); div.style = "border:1px solid #ddd; padding:10px; border-radius:10px; margin-bottom:8px; background:#fff;";
+        const div = document.createElement('div'); div.style = "border:1px solid #ddd; padding:8px; border-radius:10px; margin-bottom:8px; background:#fff;";
         div.innerHTML = `<div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:5px;">
-            <input type="text" class="m-name" value="${v.n}" style="font-size:12px;">
-            <input type="number" class="m-w-got" value="${v.wg}" placeholder="أعمال">
-            <input type="number" class="m-w-max" value="${v.wm}" placeholder="من">
-            <input type="number" class="m-e-got" value="${v.eg}" placeholder="امتحان">
-            <input type="number" class="m-e-max" value="${v.em}" placeholder="من">
+            <input type="text" class="m-name" value="${v.n}" style="font-size:12px; margin-bottom:0;">
+            <input type="number" class="m-w-got" value="${v.wg}" placeholder="أعمال" style="margin-bottom:0; padding:5px; font-size:12px;">
+            <input type="number" class="m-w-max" value="${v.wm}" placeholder="من" style="margin-bottom:0; padding:5px; font-size:12px;">
+            <input type="number" class="m-e-got" value="${v.eg}" placeholder="امتحان" style="margin-bottom:0; padding:5px; font-size:12px;">
+            <input type="number" class="m-e-max" value="${v.em}" placeholder="من" style="margin-bottom:0; padding:5px; font-size:12px;">
         </div>`;
         document.getElementById('subjectsContainer').appendChild(div);
     }
@@ -249,7 +252,7 @@
                 const s = child.val(); const sid = child.key;
                 h += `<div class="bulk-student-box" data-id="${sid}">
                     <strong style="display:block; margin-bottom:10px; color:var(--primary);">${s.name}</strong>
-                    <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:5px; text-align:center; font-size:10px; font-weight:bold; margin-bottom:5px;">
+                    <div class="grid-header" style="font-size:10px;">
                         <div>المادة</div><div>أعمال</div><div>من</div><div>امتحان</div><div>من</div>
                     </div>`;
                 schoolSubjects[yr].forEach(sub => {
@@ -345,16 +348,12 @@
         const failList = document.getElementById('failListItems');
 
         if(hasFail) {
-            gradeEl.innerText = "له دور ثانٍ"; 
-            gradeEl.className = "grade-fail";
-            totalRow.style.display = "none";
-            percentRow.style.display = "none";
-            failBox.style.display = "block";
-            failList.innerHTML = failed.join(' - ');
+            gradeEl.innerText = "له دور ثانٍ"; gradeEl.className = "grade-fail";
+            totalRow.style.display = "none"; percentRow.style.display = "none";
+            failBox.style.display = "block"; failList.innerHTML = failed.join(' - ');
         } else {
             let p=parseFloat(data.percent);
-            totalRow.style.display = "flex";
-            percentRow.style.display = "flex";
+            totalRow.style.display = "flex"; percentRow.style.display = "flex";
             failBox.style.display = "none";
             document.getElementById('outTotalSum').innerText = data.totalGot + " من " + data.totalMax;
             document.getElementById('outPercent').innerText = data.percent + "%";
