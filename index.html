@@ -26,7 +26,7 @@
         * { box-sizing: border-box; font-family: 'Cairo', sans-serif; transition: 0.2s ease; }
         body { margin: 0; background: var(--bg); color: var(--text); padding: 5px; min-height: 100vh; }
 
-        .container { max-width: 800px; margin: 15px auto; }
+        .container { max-width: 850px; margin: 15px auto; }
         .main-card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border); }
 
         .school-header { text-align: center; margin-bottom: 25px; }
@@ -44,12 +44,11 @@
         .btn-primary { background: var(--primary); color: white; }
 
         #resultView { display: none; margin-top: 20px; padding: 15px; border: 3px solid var(--primary); border-radius: 12px; background: #fff; }
-        .res-table { width: 100%; border-collapse: collapse; }
-        .res-table th { background: var(--primary); color: white; padding: 6px 2px; font-size: 10px; border: 1px solid #ddd; }
-        .res-table td { padding: 10px 2px; border: 1px solid #eee; text-align: center; font-weight: 700; font-size: 14px; }
+        .res-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .res-table th { background: var(--primary); color: white; padding: 8px 2px; font-size: 10px; border: 1px solid #ddd; line-height: 1.4; }
+        .res-table td { padding: 10px 2px; border: 1px solid #eee; text-align: center; font-weight: 700; font-size: 14px; word-wrap: break-word; }
         
-        /* توسيع خانة الاسم لضمان ظهور ال التعريف */
-        .sub-name { text-align: right !important; color: var(--primary); background: #f9fafb; font-size: 13px !important; padding-right: 8px !important; width: 35%; }
+        .sub-name { text-align: right !important; color: var(--primary); background: #f9fafb; font-size: 13px !important; padding-right: 8px !important; width: 140px !important; }
 
         .total-section { margin-top: 0px; border: 2px solid var(--primary); border-top: none; background: #f8fafc; border-radius: 0 0 10px 10px; }
         .total-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid #e2e8f0; }
@@ -100,8 +99,8 @@
             <table class="res-table">
                 <thead>
                     <tr>
-                        <th>المادة</th>
-                        <th>أعمال السنة</th><th>الدرجة الكبرى</th><th>الامتحان النهائي</th><th>الالدرجة الكبرى</th><th>المجموع</th>
+                        <th style="width: 140px;">المادة</th>
+                        <th>أعمال السنة</th><th>النهاية الصغرى</th><th>الامتحان النهائي</th><th>النهاية الكبرى</th><th>المجموع</th>
                     </tr>
                 </thead>
                 <tbody id="resTbody"></tbody>
@@ -241,18 +240,14 @@
         const rowPercent=document.getElementById('rowPercent');
 
         if(hasFail){
-            // إخفاء المجموع والنسبة للراسب
             rowTotal.style.display = 'none';
             rowPercent.style.display = 'none';
-            
             gBox.innerText = "لها دور ثانٍ"; gBox.style.color = "red";
             document.getElementById('failMissions').style.display='block';
             document.getElementById('failMissions').innerHTML = "<strong>المواد التي لم توفق فيها:</strong><br>" + failed.join(' - ');
         } else {
-            // إظهار المجموع والنسبة للناجح
             rowTotal.style.display = 'flex';
             rowPercent.style.display = 'flex';
-            
             let p=parseFloat(data.percent);
             let g = p>=85?"ممتاز":p>=75?"جيد جداً":p>=65?"جيد":p>=50?"مقبول":"ضعيف";
             gBox.innerText = g; gBox.style.color = "#059669";
