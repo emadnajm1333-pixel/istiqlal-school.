@@ -27,7 +27,6 @@
         body { margin: 0; background: var(--bg); color: var(--text); padding: 10px; min-height: 100vh; overflow-x: hidden; }
         .container { max-width: 1000px; margin: 10px auto; position: relative; }
         
-        /* الخطوط الزرقاء الجانبية - تم جعلها خلفية ثابتة لا تتداخل مع المحتوى */
         .container::before, .container::after {
             content: "";
             position: absolute;
@@ -37,6 +36,7 @@
             background: var(--primary);
             z-index: 0;
             border-radius: 10px;
+            opacity: 0.8;
         }
         .container::before { right: -15px; }
         .container::after { left: -15px; }
@@ -65,52 +65,21 @@
         
         #resultView { display: none; margin-top: 20px; padding: 10px; border-radius: 12px; background: #fff; }
         
-        /* ضبط الجدول لمنع الميلان والتداخل */
-        .res-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-bottom: 0px; 
-            table-layout: fixed; /* توزيع ثابت للأعمدة */
-        }
-        .res-table th { 
-            background: var(--primary); 
-            color: white; 
-            padding: 12px 2px; 
-            font-size: 12px; 
-            border: 1px solid #fff;
-        }
-        .res-table td { 
-            padding: 12px 2px; 
-            border: 1px solid #e2e8f0; 
-            text-align: center; 
-            font-weight: 900; 
-            color: #000;
-            font-size: 14px;
-            word-wrap: break-word;
-        }
+        .res-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .res-table th { background: var(--primary); color: white; padding: 12px 2px; font-size: 12px; border: 1px solid #fff; }
+        .res-table td { padding: 12px 2px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; color: #000; font-size: 14px; }
 
-        .summary-box {
-            margin-top: 0;
-            border: 2px solid var(--primary);
-            background: #f8fafc;
-            border-radius: 0 0 10px 10px;
-        }
+        .summary-box { margin-top: 0; border: 2px solid var(--primary); background: #f8fafc; border-radius: 0 0 10px 10px; }
+        
+        .bulk-student-box { border: 2px solid var(--primary); border-radius: 15px; padding: 15px; margin-bottom: 20px; background: #fff; }
+        .bulk-row-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 5px; align-items: center; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
+        .bulk-row-grid input { margin-bottom: 0; padding: 6px; font-size: 13px; border: 1px solid #cbd5e1; }
 
         .dev-footer-simple { text-align: center; margin-top: 30px; padding: 20px; color: #000; font-weight: 700; font-size: 15px; border-top: 1px solid #e2e8f0; }
 
         @media print {
             .btn, .search-container, #adminPortal, .admin-tabs, .dev-footer-simple, .container::before, .container::after { display: none !important; }
             #resultView { display: block !important; width: 100%; border: none; padding: 0; }
-            body { background: white; padding: 0; }
-        }
-        
-        /* تحسينات للهواتف */
-        @media (max-width: 600px) {
-            .container::before, .container::after { width: 4px; }
-            .container::before { right: -8px; }
-            .container::after { left: -8px; }
-            .res-table th { font-size: 10px; }
-            .res-table td { font-size: 12px; }
         }
     </style>
 </head>
@@ -174,8 +143,7 @@
 <div class="container" id="adminPortal" style="display:none;">
     <div class="main-card">
         <h2 style="color: var(--primary); text-align: center;"><i class="fas fa-tools"></i> بوابة المطور</h2>
-        <div id="systemStatusDisplay" class="status-badge">...</div>
-        <button onclick="toggleSystemStatus()" class="btn" style="width:auto; padding:5px 15px; font-size:12px; margin-bottom:15px;">تبديل حالة المنظومة</button>
+        <div id="systemStatusDisplay" style="text-align:center; margin-bottom:10px; font-weight:bold;">...</div>
 
         <div class="admin-tabs">
             <button class="tab-btn active" onclick="showTab('individualTab', this)">الرصد الفردي</button>
@@ -184,7 +152,7 @@
 
         <div id="individualTab" class="admin-section active">
             <div style="background:#f8fafc; padding:15px; border-radius:15px; border:1px solid #ddd;">
-                <input type="number" id="editID" placeholder="بحث بالرقم الوطني للتعديل...">
+                <input type="number" id="editID" placeholder="الرقم الوطني للتعديل...">
                 <button onclick="fetchForEdit()" class="btn" style="background:var(--primary); color:white; margin-bottom:15px;">جلب البيانات</button>
                 <input type="text" id="inName" placeholder="الاسم الرباعي">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -194,6 +162,10 @@
                         <option value="خامس">خامس</option><option value="سادس">سادس</option>
                         <option value="سابع">سابع</option><option value="ثامن">ثامن</option>
                     </select>
+                </div>
+                
+                <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:5px; text-align:center; font-size:11px; font-weight:bold; color:var(--primary); margin:10px 0;">
+                    <div>المادة</div><div>أعمال</div><div>من</div><div>امتحان</div><div>من</div>
                 </div>
                 <div id="subjectsContainer"></div>
                 <button onclick="addNewSubject()" class="btn" style="background:#e2e8f0; color:#475569; margin-bottom:15px;">+ إضافة مادة</button>
@@ -219,7 +191,6 @@
 </div>
 
 <script>
-    // الإعدادات البرمجية والربط بـ Firebase (بقيت كما هي تماماً)
     const firebaseConfig = {
       apiKey: "AIzaSyDKEPjQMKD2lt74sdGM0k7hY2Wb8E-X55g", 
       databaseURL: "https://istiqlal-school-302c8-default-rtdb.firebaseio.com",
@@ -229,6 +200,14 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // ترتيب المواد حسب الصور المرسلة
+    const schoolSubjects = {
+        "خامس": ["التاريخ", "التربية الإسلامية", "الجغرافيا", "الحاسوب", "الرياضيات", "العلوم", "الكتابة", "اللغة الإنجليزية", "اللغة العربية"],
+        "سادس": ["التاريخ", "التربية الإسلامية", "الجغرافيا", "الحاسوب", "الرياضيات", "العلوم", "الكتابة", "اللغة الإنجليزية", "اللغة العربية"],
+        "سابع": ["التاريخ", "التربية الإسلامية", "الجغرافيا", "الحاسوب", "الرياضيات", "العلوم", "الكتابة", "اللغة الإنجليزية", "اللغة العربية"],
+        "ثامن": ["التاريخ", "التربية الإسلامية", "الجغرافيا", "الحاسوب", "الرياضيات", "العلوم", "الكتابة", "اللغة الإنجليزية", "اللغة العربية"]
+    };
+
     function showTab(tabId, btn) {
         document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -236,35 +215,16 @@
         btn.classList.add('active');
     }
 
-    let isSystemEnabled = true;
-    db.ref('system_status').on('value', snap => {
-        isSystemEnabled = snap.exists() ? snap.val() : true;
-        const d = document.getElementById('systemStatusDisplay');
-        if(d) {
-            d.innerText = isSystemEnabled ? "المنظومة: مفعلة" : "المنظومة: معطلة";
-            d.className = "status-badge " + (isSystemEnabled ? "status-online" : "status-offline");
-        }
-    });
-
-    function toggleSystemStatus() { db.ref('system_status').set(!isSystemEnabled); }
-
-    const schoolSubjects = {
-        "خامس": ["الرياضيات", "العلوم", "اللغة العربية", "اللغة الإنجليزية", "التربية الإسلامية", "الاجتماعيات", "الحاسوب", "الكتابة"],
-        "سادس": ["الرياضيات", "العلوم", "اللغة العربية", "اللغة الإنجليزية", "التربية الإسلامية", "الاجتماعيات", "الحاسوب", "الكتابة"],
-        "سابع": ["الرياضيات", "العلوم", "اللغة العربية", "اللغة الإنجليزية", "التربية الإسلامية", "التاريخ", "الجغرافيا", "الحاسوب", "الكتابة"],
-        "ثامن": ["الرياضيات", "العلوم", "اللغة العربية", "اللغة الإنجليزية", "التربية الإسلامية", "التاريخ", "الجغرافيا", "الحاسوب", "الكتابة"]
-    };
-
     function enterAdmin() { if(prompt("رمز المطور:") === "74742000") { document.getElementById('searchSection').style.display='none'; document.getElementById('adminPortal').style.display='block'; } }
 
     function addNewSubject(v={n:'',wg:'',wm:40,eg:'',em:60}) {
         const div = document.createElement('div'); div.style = "border:1px solid #ddd; padding:10px; border-radius:10px; margin-bottom:8px; background:#fff;";
         div.innerHTML = `<div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:5px;">
             <input type="text" class="m-name" value="${v.n}" style="font-size:12px;">
-            <input type="number" class="m-w-got" value="${v.wg}">
-            <input type="number" class="m-w-max" value="${v.wm}">
-            <input type="number" class="m-e-got" value="${v.eg}">
-            <input type="number" class="m-e-max" value="${v.em}">
+            <input type="number" class="m-w-got" value="${v.wg}" placeholder="أعمال">
+            <input type="number" class="m-w-max" value="${v.wm}" placeholder="من">
+            <input type="number" class="m-e-got" value="${v.eg}" placeholder="امتحان">
+            <input type="number" class="m-e-max" value="${v.em}" placeholder="من">
         </div>`;
         document.getElementById('subjectsContainer').appendChild(div);
     }
@@ -285,14 +245,17 @@
             let h = "";
             snap.forEach(child => {
                 const s = child.val(); const sid = child.key;
-                h += `<div class="bulk-student-box" data-id="${sid}" style="border:1px solid var(--primary); padding:10px; margin-bottom:10px; border-radius:10px;">
-                    <strong style="display:block; margin-bottom:5px;">${s.name}</strong>`;
+                h += `<div class="bulk-student-box" data-id="${sid}">
+                    <strong style="display:block; margin-bottom:10px; color:var(--primary);">${s.name}</strong>
+                    <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:5px; text-align:center; font-size:10px; font-weight:bold; margin-bottom:5px;">
+                        <div>المادة</div><div>أعمال</div><div>من</div><div>امتحان</div><div>من</div>
+                    </div>`;
                 schoolSubjects[yr].forEach(sub => {
                     const ex = (s.subjects && s.subjects[sub]) ? s.subjects[sub] : {wG:'', eG:'', wM:40, eM:60};
-                    h += `<div class="bulk-row-grid" data-sub="${sub}" style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:3px; margin-bottom:3px;">
+                    h += `<div class="bulk-row-grid" data-sub="${sub}">
                         <span style="font-size:11px;">${sub}</span>
-                        <input type="number" class="bw-g" value="${ex.wG}" style="padding:2px; margin:0;"> <input type="number" class="bw-m" value="${ex.wM}" style="padding:2px; margin:0;">
-                        <input type="number" class="be-g" value="${ex.eG}" style="padding:2px; margin:0;"> <input type="number" class="be-m" value="${ex.eM}" style="padding:2px; margin:0;">
+                        <input type="number" class="bw-g" value="${ex.wG}"> <input type="number" class="bw-m" value="${ex.wM}">
+                        <input type="number" class="be-g" value="${ex.eG}"> <input type="number" class="be-m" value="${ex.eM}">
                     </div>`;
                 });
                 h += `</div>`;
@@ -307,7 +270,7 @@
             const sid = box.getAttribute('data-id');
             let subs = {}; let tS = 0; let tM = 0;
             box.querySelectorAll('.bulk-row-grid').forEach(grid => {
-                const n = grid.getAttribute('data-sub');
+                const n = grid.innerText.trim();
                 const wg = parseFloat(grid.querySelector('.bw-g').value) || 0;
                 const wm = parseFloat(grid.querySelector('.bw-m').value) || 0;
                 const eg = parseFloat(grid.querySelector('.be-g').value) || 0;
@@ -351,9 +314,8 @@
     }
 
     function loadResult() {
-        if(!isSystemEnabled) { alert("المنظومة معطلة حالياً."); return; }
         const sid=document.getElementById('searchID').value;
-        db.ref('students/'+sid).once('value', snap=>{ if(snap.exists()) showData(snap.val()); else alert("عذراً، الرقم الوطني غير مسجل."); });
+        db.ref('students/'+sid).once('value', snap=>{ if(snap.exists()) showData(snap.val()); else alert("عذراً، الرقم غير مسجل."); });
     }
 
     function showData(data) {
@@ -363,11 +325,16 @@
         document.getElementById('outPercent').innerText = data.percent + "%";
         document.getElementById('outTotalSum').innerText = data.totalGot + " من " + data.totalMax;
         let h=""; let failed=[]; let hasFail=false;
-        for(let k in data.subjects){
-            const s=data.subjects[k]; const isFail = s.sum < (s.max/2);
-            if(isFail) { hasFail=true; failed.push(k); }
-            h+=`<tr><td>${k}</td><td>${s.wG}</td><td>${s.wM}</td><td>${s.eG}</td><td>${s.eM}</td><td style="color:${isFail?'red':'black'}">${s.sum}</td></tr>`;
-        }
+        
+        const sortedKeys = schoolSubjects[data.year] || Object.keys(data.subjects);
+        
+        sortedKeys.forEach(k => {
+            if(data.subjects[k]) {
+                const s = data.subjects[k]; const isFail = s.sum < (s.max/2);
+                if(isFail) { hasFail=true; failed.push(k); }
+                h+=`<tr><td>${k}</td><td>${s.wG}</td><td>${s.wM}</td><td>${s.eG}</td><td>${s.eM}</td><td style="color:${isFail?'red':'black'}">${s.sum}</td></tr>`;
+            }
+        });
         document.getElementById('resTbody').innerHTML=h;
         let p=parseFloat(data.percent);
         document.getElementById('outGrade').innerText = hasFail ? "له دور ثانٍ" : (p>=85?"ممتاز":p>=75?"جيد جداً":p>=65?"جيد":p>=50?"مقبول":"ضعيف");
