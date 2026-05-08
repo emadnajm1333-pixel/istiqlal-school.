@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منظومة نتائج الاستقلال</title>
+    <title>منظومة نتائج الامتحانات الاستقلال</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -66,7 +66,7 @@
             border-radius: 12px; 
             background: #fff;
             position: relative;
-            z-index: 20; /* لضمان ظهور النتيجة فوق أي خطوط خلفية */
+            z-index: 20;
         }
         
         .res-table { width: 100%; border-collapse: collapse; background: white; }
@@ -177,7 +177,10 @@
             </div>
             <div id="subjectsContainer"></div>
             <button onclick="addNewSubject()" class="btn" style="background:#e2e8f0; color:#475569; margin-bottom:15px;">+ إضافة مادة</button>
-            <button class="btn" style="background: var(--success); color:white;" onclick="saveToFirebase()">حفظ البيانات</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="btn" style="background: var(--success); color:white;" onclick="saveToFirebase()">حفظ البيانات</button>
+                <button class="btn" style="background: var(--danger); color:white;" onclick="deleteStudent()">حذف الطالبة</button>
+            </div>
             <button onclick="location.reload()" class="btn" style="background:none;">خروج</button>
         </div>
     </div>
@@ -245,6 +248,17 @@
         db.ref('students/'+id).set({name, year:yr, subjects:subs, percent:((tS/tM)*100).toFixed(1), totalGot:tS, totalMax:tM}).then(()=>alert("تم الحفظ بنجاح"));
     }
 
+    function deleteStudent() {
+        const id = document.getElementById('inID').value;
+        if(!id) return alert("يرجى إدخال الرقم الوطني أولاً");
+        if(confirm("هل أنت متأكد من حذف بيانات هذه الطالبة نهائياً؟")) {
+            db.ref('students/'+id).remove().then(() => {
+                alert("تم الحذف بنجاح");
+                location.reload();
+            });
+        }
+    }
+
     function loadResult() {
         const sid=document.getElementById('searchID').value;
         db.ref('students/'+sid).once('value', snap=>{ if(snap.exists()) showData(snap.val()); else alert("الرقم الوطني غير مسجل"); });
@@ -287,3 +301,4 @@
 </script>
 </body>
 </html>
+
