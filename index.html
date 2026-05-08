@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منظومة نتائج مدرسة الاستقلال</title>
+    <title>منظومة مدرسة الاستقلال - 2026</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,15 +18,11 @@
         .container { max-width: 1000px; margin: 10px auto; }
         .main-card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border); }
         
-        /* تنسيق الجدول لمنع التداخل في الموبايل */
-        .res-table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid var(--border); }
-        .res-table th { background: var(--primary); color: white; padding: 6px 1px; font-size: 9px; border: 1px solid #fff; line-height: 1.1; word-wrap: break-word; vertical-align: middle; height: 45px; }
-        .res-table th:first-child { width: 22%; } 
-        .res-table th:nth-child(3) { width: 15%; } 
-        .res-table th:nth-child(5) { width: 18%; font-size: 8.5px; } 
-        .res-table td { padding: 8px 1px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; color: #000; font-size: 13px; }
+        .res-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .res-table th { background: var(--primary); color: white; padding: 6px 1px; font-size: 9px; border: 1px solid #fff; }
+        .res-table td { padding: 8px 1px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; font-size: 13px; }
 
-        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--border); margin-bottom: 10px; text-align: center; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--border); margin-bottom: 10px; text-align: center; }
         .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; }
         .btn-primary { background: var(--primary); color: white; }
         
@@ -47,11 +43,11 @@
                 <i class="fas fa-school"></i>
             </div>
             <h1 style="margin: 5px 0; font-size: 24px; font-weight: 900; color: var(--primary);">منظومة مدرسة الاستقلال</h1>
-            <p style="color: #64748b; font-weight: 700;">اضغط مرة للدخول بالبصمة، مرتين للكود</p>
+            <p style="color: #64748b; font-weight: 700;">اضغط مرة للبصمة، مرتين للكود</p>
         </div>
 
         <div style="max-width:400px; margin:0 auto;">
-            <input type="number" id="searchID" placeholder="أدخل الرقم الوطني للطالبة">
+            <input type="number" id="searchID" placeholder="الرقم الوطني للطالبة">
             <button class="btn btn-primary" onclick="loadResult()"><i class="fas fa-search"></i> استخراج الشهادة</button>
         </div>
 
@@ -70,7 +66,7 @@
         <h2 style="text-align:center;">بوابة الإدارة</h2>
         
         <button class="btn" style="background:orange; color:white; margin-bottom:20px;" onclick="registerPasskey()">
-            <i class="fas fa-fingerprint"></i> تفعيل بصمة هذا الجهاز
+            <i class="fas fa-fingerprint"></i> تفعيل "النمط" أو "البصمة" لهذا الجهاز
         </button>
 
         <div class="admin-tabs">
@@ -105,22 +101,26 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // دالة الدخول بالبصمة
+    // دالة الدخول (التحقق)
     async function loginWithBiometrics() {
         if (window.PublicKeyCredential) {
             try {
                 const credential = await navigator.credentials.get({
-                    publicKey: { challenge: new Uint8Array([1, 2, 3, 4]), userVerification: "required" }
+                    publicKey: { 
+                        challenge: new Uint8Array([1, 2, 3, 4]), 
+                        userVerification: "required",
+                        timeout: 60000
+                    }
                 });
-                if (credential) { openAdmin(); }
+                if (credential) openAdmin();
             } catch (err) {
-                console.log("البصمة غير مسجلة، جرب الكود السري");
+                console.log("فشل التحقق، الانتقال للكود السري");
                 enterAdmin(); 
             }
         } else { enterAdmin(); }
     }
 
-    // دالة تعريف البصمة للكروم (تُستخدم مرة واحدة)
+    // دالة التسجيل (التعديل السحري لقبول النمط)
     async function registerPasskey() {
         try {
             await navigator.credentials.create({
@@ -128,22 +128,25 @@
                     challenge: new Uint8Array([1, 2, 3, 4]),
                     rp: { name: "مدرسة الاستقلال" },
                     user: { id: new Uint8Array([1]), name: "admin", displayName: "Admin" },
-                    pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+                    pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
                     timeout: 60000,
-                    authenticatorSelection: { userVerification: "required" }
+                    authenticatorSelection: { 
+                        authenticatorAttachment: "platform", // إجبار المتصفح على استخدام قفل الجهاز نفسه
+                        userVerification: "required",
+                        residentKey: "required"
+                    }
                 }
             });
-            alert("تم تفعيل البصمة بنجاح!");
-        } catch (err) { alert("خطأ في التفعيل: " + err.message); }
+            alert("تم تفعيل القفل (النمط/البصمة) بنجاح!");
+        } catch (err) { alert("خطأ: " + err.message); }
     }
 
     function enterAdmin() { if(prompt("رمز المطور:") === "74742000") openAdmin(); }
     function openAdmin() { document.getElementById('searchSection').style.display='none'; document.getElementById('adminPortal').style.display='block'; }
     function showTab(t, b) { document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active')); document.getElementById(t).classList.add('active'); b.classList.add('active'); }
 
-    // بقية دوال الرصد والحفظ (التي تعمل عندك سابقاً)
+    // دوال الرصد
     function autoFillSubjects() {
-        const yr = document.getElementById('inYear').value;
         const subjects = ["التاريخ", "التربية الإسلامية", "الجغرافيا", "الحاسوب", "الرياضيات", "العلوم", "الكتابة", "اللغة الإنجليزية", "اللغة العربية"];
         const con = document.getElementById('subjectsContainer'); con.innerHTML = "";
         subjects.forEach(s => {
