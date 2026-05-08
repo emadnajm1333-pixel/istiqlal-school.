@@ -56,10 +56,21 @@
         
         #resultView { display: none; margin-top: 20px; padding: 10px; border-radius: 12px; background: #fff; }
         
+        /* تحسين الجدول لمنع تداخل الكلمات */
         .res-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        .res-table th { background: var(--primary); color: white; padding: 12px 2px; font-size: 11px; border: 1px solid #fff; }
-        .res-table th:last-child { width: 70px; }
-        .res-table td { padding: 12px 2px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; color: #000; font-size: 14px; }
+        .res-table th { 
+            background: var(--primary); 
+            color: white; 
+            padding: 8px 1px; 
+            font-size: 10px; /* تصغير الخط قليلاً للعناوين */
+            border: 1px solid #fff;
+            line-height: 1.2;
+            word-wrap: break-word; /* كسر الكلمة إذا كانت طويلة */
+        }
+        .res-table th:first-child { width: 22%; } /* عمود المادة */
+        .res-table th:last-child { width: 15%; } /* عمود المجموع */
+        
+        .res-table td { padding: 12px 1px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; color: #000; font-size: 13px; }
 
         .summary-box { margin-top: 0; border: 2px solid var(--primary); background: #f8fafc; border-radius: 0 0 10px 10px; }
         
@@ -106,11 +117,11 @@
                 <table class="res-table">
                     <thead>
                         <tr>
-                            <th style="width: 25%;">المادة</th>
+                            <th>المادة</th>
                             <th>الأعمال</th>
-                            <th>نهاية صغرى</th>
+                            <th>النهاية الصغرى</th>
                             <th>الامتحان</th>
-                            <th>نهاية كبرى</th>
+                            <th>النهاية الكبرى</th>
                             <th>المجموع</th>
                         </tr>
                     </thead>
@@ -358,3 +369,4 @@
 </script>
 </body>
 </html>
+
