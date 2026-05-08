@@ -91,6 +91,11 @@
         .score-item input { margin-bottom: 0; padding: 12px; font-size: 18px; font-weight: 700; border: 2px solid #cbd5e1; border-radius: 10px; }
         .remove-btn { position: absolute; left: 15px; top: 15px; color: var(--danger); font-size: 20px; }
 
+        /* ستايل زر التعطيل الجديد */
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; float: left; margin-top: 5px; }
+        .status-online { background: #dcfce7; color: #166534; }
+        .status-offline { background: #fee2e2; color: #991b1b; }
+
         .dev-footer-simple { text-align: center; margin-top: 30px; padding: 20px; color: #000; font-weight: 700; font-size: 15px; border-top: 1px solid #e2e8f0; }
 
         @media print {
@@ -157,6 +162,16 @@
     <div class="main-card" style="border-top: 10px solid var(--accent);">
         <h2 style="color: var(--primary); text-align: center;"><i class="fas fa-tools"></i> بوابة المطور</h2>
         <div class="admin-dashboard">
+            
+            <div class="admin-card" style="border: 2px dashed var(--primary); background: #eff6ff;">
+                <label style="font-weight: 900; color: var(--primary);">التحكم في ظهور النتائج للطلاب</label>
+                <div id="systemStatusDisplay" class="status-badge">جاري التحقق...</div>
+                <button id="toggleSystemBtn" onclick="toggleSystemStatus()" class="btn" style="margin-top: 10px; font-size: 14px; padding: 8px;">
+                    تبديل حالة المنظومة
+                </button>
+                <small style="display: block; margin-top: 5px; color: #64748b;">* عند التعطيل، لن يتمكن الطلاب من استخراج نتائجهم.</small>
+            </div>
+
             <div class="admin-card">
                 <label>تعديل طالبة سابقة</label>
                 <div style="display: flex; gap: 8px;">
@@ -195,6 +210,35 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
+    // متغير عالمي لحفظ حالة المنظومة
+    let isSystemEnabled = true;
+
+    // مراقبة حالة المنظومة فور فتح الصفحة
+    db.ref('system_status').on('value', snap => {
+        isSystemEnabled = snap.exists() ? snap.val() : true;
+        updateAdminStatusUI();
+    });
+
+    function updateAdminStatusUI() {
+        const display = document.getElementById('systemStatusDisplay');
+        const btn = document.getElementById('toggleSystemBtn');
+        if(isSystemEnabled) {
+            display.innerText = "المنظومة: مفعلة (متاحة للطلاب)";
+            display.className = "status-badge status-online";
+            btn.style.background = "var(--danger)";
+            btn.innerText = "تعطيل المنظومة الآن";
+        } else {
+            display.innerText = "المنظومة: معطلة (مغلقة للرصد)";
+            display.className = "status-badge status-offline";
+            btn.style.background = "var(--success)";
+            btn.innerText = "تفعيل المنظومة الآن";
+        }
+    }
+
+    function toggleSystemStatus() {
+        db.ref('system_status').set(!isSystemEnabled);
+    }
 
     const schoolSubjects = {
         "ثامن": ["اللغة العربية", "التربية الإسلامية", "علوم", "كتابة", "اللغة الإنجليزية", "تاريخ", "حاسوب", "رياضيات", "جغرافيا"],
@@ -259,7 +303,12 @@
         }
     }
 
+    // تعديل وظيفة التحميل لإضافة شرط "حالة المنظومة"
     function loadResult() {
+        if(!isSystemEnabled) {
+            alert("نعتذر، المنظومة معطلة حالياً لرصد واعتماد نتائج الامتحانات. يرجى المحاولة لاحقاً.");
+            return;
+        }
         const sid=document.getElementById('searchID').value;
         db.ref('students/'+sid).once('value', snap=>{ if(snap.exists()) showData(snap.val()); else alert("الرقم الوطني غير مسجل"); });
     }
@@ -301,4 +350,3 @@
 </script>
 </body>
 </html>
-
