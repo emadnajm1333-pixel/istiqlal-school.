@@ -219,14 +219,13 @@
 
     function enterAdmin() {
         const pass = prompt("رمز المطور:");
-        // الربط مع المسار الموجود في صورتك الأخيرة (settings/dev_pass)
         db.ref('settings/dev_pass').once('value', snap => {
             const serverPass = snap.val();
             if(String(pass).trim() === String(serverPass).trim()) {
                 document.getElementById('searchSection').style.display='none';
                 document.getElementById('adminPortal').style.display='block';
             } else {
-                alert("الرمز غير صحيح، يرجى مراجعة إعدادات Firebase");
+                alert("الرمز غير صحيح");
             }
         });
     }
@@ -255,7 +254,7 @@
         if(!yr) return;
         container.innerHTML = "جاري التحميل...";
         db.ref('students').orderByChild('year').equalTo(yr).once('value', snap => {
-            if(!snap.exists()) { container.innerHTML = "لا يوجد بيانات"; return; }
+            if(!snap.exists()) { container.innerHTML = "لا يوجد بيانات لهذا الصف"; return; }
             let h = "";
             snap.forEach(child => {
                 const s = child.val(); const sid = child.key;
@@ -268,7 +267,7 @@
                     const ex = (s.subjects && s.subjects[sub]) ? s.subjects[sub] : {wG:'', eG:'', wM:40, eM:60};
                     h += `<div class="bulk-row-grid" data-sub="${sub}">
                         <span style="font-size:11px;">${sub}</span>
-                        <input type="number" class="bw-g" value="${ex.wG}"> <input type="number" class="bw-m" value="${ex.bw-m}">
+                        <input type="number" class="bw-g" value="${ex.wG}"> <input type="number" class="bw-m" value="${ex.wM}">
                         <input type="number" class="be-g" value="${ex.eG}"> <input type="number" class="be-m" value="${ex.eM}">
                     </div>`;
                 });
@@ -284,7 +283,7 @@
             const sid = box.getAttribute('data-id');
             let subs = {}; let tS = 0; let tM = 0;
             box.querySelectorAll('.bulk-row-grid').forEach(grid => {
-                const n = grid.innerText.trim().split('\n')[0];
+                const n = grid.getAttribute('data-sub');
                 const wg = parseFloat(grid.querySelector('.bw-g').value) || 0;
                 const wm = parseFloat(grid.querySelector('.bw-m').value) || 0;
                 const eg = parseFloat(grid.querySelector('.be-g').value) || 0;
@@ -294,7 +293,7 @@
             });
             await db.ref('students/'+sid).update({subjects:subs, totalGot:tS, totalMax:tM, percent:((tS/tM)*100).toFixed(1)});
         }
-        alert("تم الحفظ بنجاح");
+        alert("تم حفظ جميع البيانات بنجاح");
     }
 
     function fetchForEdit() {
@@ -319,17 +318,17 @@
             const eg=parseFloat(parent.querySelector('.m-e-got').value)||0; const em=parseFloat(parent.querySelector('.m-e-max').value)||0;
             if(n){ subs[n]={wG:wg, wM:wm, eG:eg, eM:em, sum:(wg+eg), max:(wm+em)}; tS+=(wg+eg); tM+=(wm+em); }
         });
-        db.ref('students/'+id).set({name, year:yr, subjects:subs, percent:((tS/tM)*100).toFixed(1), totalGot:tS, totalMax:tM}).then(()=>alert("تم الحفظ"));
+        db.ref('students/'+id).set({name, year:yr, subjects:subs, percent:((tS/tM)*100).toFixed(1), totalGot:tS, totalMax:tM}).then(()=>alert("تم الحفظ بنجاح"));
     }
 
     function deleteStudent() {
         const id = document.getElementById('inID').value;
-        if(id && confirm("حذف نهائي؟")) db.ref('students/'+id).remove().then(()=>location.reload());
+        if(id && confirm("هل أنت متأكد من الحذف النهائي؟")) db.ref('students/'+id).remove().then(()=>location.reload());
     }
 
     function loadResult() {
         const sid=document.getElementById('searchID').value;
-        db.ref('students/'+sid).once('value', snap=>{ if(snap.exists()) showData(snap.val()); else alert("عذراً، الرقم غير مسجل."); });
+        db.ref('students/'+sid).once('value', snap=>{ if(snap.exists()) showData(snap.val()); else alert("عذراً، الرقم غير مسجل في المنظومة."); });
     }
 
     function showData(data) {
