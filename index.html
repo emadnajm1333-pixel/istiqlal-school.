@@ -103,7 +103,9 @@
     <div class="main-card">
         <div id="welcomeArea">
             <div class="school-header" style="text-align:center; margin-bottom:20px;">
-                <div class="school-icon" style="font-size:40px; color:var(--primary); cursor:pointer;" ondblclick="enterAdmin()"><i class="fas fa-school"></i></div>
+                <div style="cursor:pointer;" ondblclick="enterAdmin()">
+                    <img src="1000255629.jpg" style="width: 130px; height: auto; border-radius: 15px; margin-bottom: 10px;" alt="شعار المدرسة">
+                </div>
                 <h1 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--primary);">منظومة نتائج الاستقلال</h1>
                 <p style="color: #64748b; font-weight: 700; font-size: 14px;">نتائج الامتحانات 2026</p>
             </div>
@@ -123,10 +125,10 @@
                 <i class="fas fa-arrow-right"></i> العودة للإحصائيات
             </button>
 
-            <div style="cursor:pointer;" ondblclick="enterAdmin()">
-    <img src="1000255629.jpg" style="width:130px; height:auto; border-radius:15px; margin-bottom:10px;" alt="Logo">
-</div>
-
+            <div style="text-align: center; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 15px;">
+                <h2 id="outName" style="margin: 0; font-size: 20px; color: var(--text);"></h2>
+                <div id="outYear" style="color: var(--accent); font-weight: 800; font-size: 15px; margin-top: 5px;"></div>
+            </div>
             
             <table class="res-table">
                 <thead>
