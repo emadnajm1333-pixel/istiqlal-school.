@@ -95,11 +95,6 @@
 </head>
 <body>
 
-<!-- تم تغيير الرابط لصوت ألعاب نارية فقط بدون أي صوت بشري -->
-<audio id="fireworksAudio" preload="auto">
-    <source src="https://assets.mixkit.co/active_storage/sfx/2012/2012-preview.mp3" type="audio/mpeg">
-</audio>
-
 <div id="loadingOverlay">
     <div class="spinner"></div>
     <p style="margin-top:15px; font-weight:900; color:var(--primary);">جاري جلب البيانات...</p>
@@ -138,9 +133,9 @@
                 <thead>
                     <tr>
                         <th style="width: 26%;">المادة</th>
-                        <th>أعمال</th>
+                        <th>أعمال من</th>
                         <th>النهاية الصغرى</th>
-                        <th>امتحان</th>
+                        <th>امتحان من</th>
                         <th>النهاية الكبرى</th>
                         <th>المجموع</th>
                     </tr>
@@ -199,9 +194,8 @@
                 <option value="خامس">خامس</option><option value="سادس">سادس</option>
                 <option value="سابع">سابع</option><option value="ثامن">ثامن</option>
             </select>
-            <!-- تم تعديل العناوين هنا لتصبح أعمال من / امتحان من -->
             <div id="individualHeaderLabels" style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:5px; font-size:11px; font-weight:bold; text-align:center; color:var(--primary); margin-bottom:5px;">
-                <span>المادة</span><span>أعمال</span><span>من</span><span>امتحان</span><span>من</span>
+                <span>المادة</span><span>أعمال من</span><span>من</span><span>امتحان من</span><span>من</span>
             </div>
             <div id="subjectsContainer"></div>
             <button class="btn" style="background: var(--success); color:white;" onclick="saveToFirebase()">حفظ ورصد الطالبة</button>
@@ -318,7 +312,7 @@
                 html += `<div class="bulk-row" data-id="${c.key}">
                     <i class="fas fa-trash delete-btn" onclick="deleteStudent('${c.key}')"></i>
                     <div style="font-weight:900; color:var(--primary); margin-bottom:10px;">${s.name} (${c.key})</div>
-                    <div class="bulk-header-labels"><span>المادة</span><span>أعمال</span><span>من</span><span>امتحان</span><span>من</span></div>`;
+                    <div class="bulk-header-labels"><span>المادة</span><span>أعمال من</span><span>من</span><span>امتحان من</span><span>من</span></div>`;
                 
                 schoolSubjects[yr].forEach(subName => {
                     const subData = (s.subjects && s.subjects[subName]) ? s.subjects[subName] : {wG:0, wM:40, eG:0, eM:60};
@@ -418,9 +412,6 @@
         const sid=document.getElementById('searchID').value;
         if(!sid) return;
         
-        const audio = document.getElementById('fireworksAudio');
-        audio.play().then(() => { audio.pause(); audio.currentTime = 0; }).catch(() => {});
-
         document.getElementById('loadingOverlay').style.display='flex';
         setTimeout(() => {
             db.ref('students/'+sid).once('value', snap=>{ 
@@ -471,9 +462,6 @@
     }
 
     function triggerCelebration() {
-        const audio = document.getElementById('fireworksAudio');
-        audio.play().catch(e => console.error("فشل تشغيل الصوت:", e));
-
         var duration = 4 * 1000;
         var end = Date.now() + duration;
 
@@ -527,4 +515,3 @@
 </script>
 </body>
 </html>
-
