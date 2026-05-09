@@ -77,7 +77,6 @@
         .dev-footer-simple { text-align: center; margin-top: 15px; padding: 10px; color: #000; font-weight: 700; font-size: 13px; border-top: 1px solid #e2e8f0; }
         .wish-text-inline { color: #e11d48; font-weight: 800; font-size: 12px; margin-right: 8px; vertical-align: middle; }
 
-        /* تنسيقات الرصد الجماعي المحدثة */
         .bulk-row { background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border); position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .bulk-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 5px; margin-top: 5px; }
         .bulk-header-labels { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 5px; font-size: 10px; font-weight: bold; text-align: center; color: var(--primary); margin-top: 10px; }
@@ -308,7 +307,13 @@
                 html += `<div class="bulk-row" data-id="${c.key}">
                     <i class="fas fa-trash delete-btn" onclick="deleteStudent('${c.key}')"></i>
                     <div style="font-weight:900; color:var(--primary); margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">${s.name} (${c.key})</div>
-                    <div class="bulk-header-labels"><span>المادة</span><span>أعمال</span><span>أعمال من</span><span>امتحان</span><span>امتحان من</span></div>`;
+                    <div class="bulk-header-labels">
+                        <span>المادة</span>
+                        <span>أعمال</span>
+                        <span>من</span>
+                        <span>امتحان</span>
+                        <span>من</span>
+                    </div>`;
                 
                 schoolSubjects[yr].forEach(subName => {
                     const subData = (s.subjects && s.subjects[subName]) ? s.subjects[subName] : {wG:0, wM:40, eG:0, eM:60};
