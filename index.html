@@ -28,20 +28,13 @@
         body { margin: 0; background: var(--bg); color: var(--text); padding: 10px; min-height: 100vh; }
         .container { max-width: 1000px; margin: 10px auto; position: relative; }
         
-        #loadingOverlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.8); z-index: 9999; justify-content: center; align-items: center;
-        }
-        .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         .main-card { 
             background: var(--card); border-radius: 20px; padding: 25px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border);
             text-align: center;
         }
         
-        /* تنسيق الصورة لضمان الظهور */
+        /* تنسيق الصورة المزروعة */
         .school-logo-main {
             width: 180px;
             height: auto;
@@ -51,7 +44,7 @@
         }
 
         .search-container { max-width: 450px; margin: 20px auto; }
-        input { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid var(--border); text-align: center; margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid var(--border); text-align: center; margin-bottom: 15px; outline: none; }
         .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 17px; }
         .btn-primary { background: var(--primary); color: white; }
 
@@ -61,7 +54,7 @@
         .res-table td { padding: 12px; border: 1px solid #e2e8f0; text-align: center; font-weight: 800; }
 
         .summary-box { background: #f8fafc; border: 2px solid var(--primary); border-radius: 12px; margin-top: 20px; padding: 15px; }
-        .dev-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-weight: 700; }
+        .dev-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-weight: 700; color: #475569; }
 
         @media print {
             .btn, .search-container, #adminPortal, .dev-footer { display: none !important; }
@@ -71,7 +64,9 @@
 </head>
 <body>
 
-<div id="loadingOverlay"><div class="spinner"></div></div>
+<div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:9999; justify-content:center; align-items:center;">
+    <div style="width:50px; height:50px; border:5px solid #f3f3f3; border-top:5px solid var(--primary); border-radius:50%; animation:spin 1s linear infinite;"></div>
+</div>
 
 <div class="container" id="searchSection">
     <div class="main-card">
@@ -81,7 +76,7 @@
             <p style="color: #64748b; font-weight: 700; font-size: 14px;">Al-Istiklal School For Basic Education</p>
 
             <div class="search-container">
-                <p style="font-weight: 800; color: var(--danger);">بالتوفيق لجميع طالباتنا</p>
+                <p style="font-weight: 800; color: var(--danger); margin-bottom: 10px;">بالتوفيق لجميع طالباتنا</p>
                 <input type="number" id="searchID" placeholder="أدخل الرقم الوطني هنا...">
                 <button class="btn btn-primary" onclick="loadResult()"><i class="fas fa-search"></i> استخراج النتيجة</button>
             </div>
@@ -90,7 +85,14 @@
         <div id="resultView">
             <h2 id="outName"></h2>
             <div id="outYear" style="color: var(--accent); font-weight: 900; margin-bottom: 20px;"></div>
-            <table class="res-table"><tbody id="resTbody"></tbody></table>
+            <table class="res-table">
+                <thead>
+                    <tr>
+                        <th>المادة</th><th>أعمال</th><th>صغرى</th><th>امتحان</th><th>كبرى</th><th>المجموع</th>
+                    </tr>
+                </thead>
+                <tbody id="resTbody"></tbody>
+            </table>
             <div class="summary-box" id="summaryArea"></div>
             <button class="btn" style="background: #e2e8f0; margin-top: 20px;" onclick="location.reload()">بحث جديد</button>
         </div>
@@ -125,7 +127,19 @@
         document.getElementById('resultView').style.display = 'block';
         document.getElementById('outName').innerText = data.name;
         document.getElementById('outYear').innerText = "الصف: " + data.year;
-        // ... (بقية منطق عرض البيانات كما هو في كودك الأصلي)
+        
+        let h = "";
+        for (let k in data.subjects) {
+            let s = data.subjects[k];
+            h += `<tr><td>${k}</td><td>${s.wG}</td><td>${s.wM}</td><td>${s.eG}</td><td>${s.eM}</td><td>${s.sum}</td></tr>`;
+        }
+        document.getElementById('resTbody').innerHTML = h;
+        
+        document.getElementById('summaryArea').innerHTML = `
+            <div style="display:flex; justify-content:space-between;"><span>المجموع:</span><b>${data.totalGot} / ${data.totalMax}</b></div>
+            <div style="display:flex; justify-content:space-between; margin-top:10px;"><span>النسبة:</span><b>${data.percent}%</b></div>
+        `;
+
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
     }
 
@@ -136,5 +150,6 @@
         });
     }
 </script>
+<style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
 </body>
 </html>
