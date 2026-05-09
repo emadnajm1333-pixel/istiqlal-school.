@@ -56,7 +56,6 @@
         
         #resultView { display: none; margin-top: 20px; padding: 10px; border-radius: 12px; background: #fff; }
         
-                /* الكود الجديد المصلح للتداخل */
         .res-table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid var(--border); }
         .res-table th { 
             background: var(--primary); color: white; padding: 6px 1px; font-size: 9px; border: 1px solid #fff;
@@ -66,7 +65,6 @@
         .res-table th:nth-child(3), .res-table th:nth-child(5) { width: 18%; font-size: 8.5px; } 
         .res-table td { padding: 8px 1px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; color: #000; font-size: 12px; }
 
-
         .summary-box { margin-top: 0; border: 2px solid var(--primary); background: #f8fafc; border-radius: 0 0 10px 10px; }
         
         .grade-excellent { color: #065f46 !important; background: #dcfce7; padding: 2px 10px; border-radius: 8px; border: 1px solid #059669; }
@@ -74,7 +72,6 @@
         .grade-good { color: #92400e !important; background: #fef3c7; padding: 2px 10px; border-radius: 8px; border: 1px solid #d97706; }
         .grade-fail { color: #991b1b !important; background: #fee2e2; padding: 2px 10px; border-radius: 8px; border: 1px solid #ef4444; }
 
-        /* تنسيق شبكة الرصد */
         .grid-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 5px; text-align: center; font-size: 11px; font-weight: bold; color: var(--primary); margin: 10px 0; }
         .bulk-student-box { border: 2px solid var(--primary); border-radius: 15px; padding: 15px; margin-bottom: 20px; background: #fff; }
         .bulk-row-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 5px; align-items: center; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
@@ -184,7 +181,7 @@
         </div>
 
         <div id="bulkTab" class="admin-section">
-             <select id="bulkSelectYear" onchange="loadBulkStudentsList()">
+             <select id="bulkSelectYear" onchange="loadBulkSubjectsList()">
                 <option value="">-- اختر الصف --</option>
                 <option value="خامس">خامس</option><option value="سادس">سادس</option>
                 <option value="سابع">سابع</option><option value="ثامن">ثامن</option>
@@ -220,7 +217,21 @@
         btn.classList.add('active');
     }
 
-    function enterAdmin() { if(prompt("رمز المطور:") === "74742000") { document.getElementById('searchSection').style.display='none'; document.getElementById('adminPortal').style.display='block'; } }
+    // الدالة السحابية الجديدة: تجلب الرمز من Firebase وتتحقق منه دون كتابته في الكود
+    async function enterAdmin() {
+        const userInput = prompt("أدخل رمز المطور:");
+        if (!userInput) return;
+
+        db.ref('settings/dev_pass').once('value', (snapshot) => {
+            const secretCode = snapshot.val();
+            if (userInput === secretCode) {
+                document.getElementById('searchSection').style.display = 'none';
+                document.getElementById('adminPortal').style.display = 'block';
+            } else {
+                alert("الرمز غير صحيح!");
+            }
+        });
+    }
 
     function addNewSubject(v={n:'',wg:'',wm:40,eg:'',em:60}) {
         const div = document.createElement('div'); div.style = "border:1px solid #ddd; padding:8px; border-radius:10px; margin-bottom:8px; background:#fff;";
@@ -240,7 +251,7 @@
         if (schoolSubjects[yr]) schoolSubjects[yr].forEach(s => addNewSubject({n:s, wg:'', wm:40, eg:'', em:60}));
     }
 
-    function loadBulkStudentsList() {
+    function loadBulkSubjectsList() {
         const yr = document.getElementById('bulkSelectYear').value;
         const container = document.getElementById('bulkStudentsContainer');
         if(!yr) return;
@@ -368,3 +379,4 @@
 </script>
 </body>
 </html>
+
