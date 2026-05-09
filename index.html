@@ -71,7 +71,6 @@
 
         .summary-box { margin-top: 0; border: 2px solid var(--primary); background: #f8fafc; border-radius: 0 0 10px 10px; }
         
-        /* ألوان الإحصائيات والتقديرات */
         .status-pass-text { color: var(--success) !important; font-weight: 900; }
         .status-fail-text { color: var(--danger) !important; font-weight: 900; }
         .grade-success-color { color: var(--success) !important; font-weight: 900; }
@@ -84,7 +83,6 @@
         .dev-footer-simple { text-align: center; margin-top: 30px; padding: 20px; color: #000; font-weight: 700; font-size: 15px; border-top: 1px solid #e2e8f0; }
         .wish-text-inline { color: #e11d48; font-weight: 800; font-size: 13px; margin-right: 10px; vertical-align: middle; }
 
-        /* الرصد الجماعي */
         .bulk-row { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); position: relative; }
         .bulk-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 5px; margin-top: 10px; }
         .bulk-header-labels { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 5px; font-size: 11px; font-weight: bold; text-align: center; color: var(--primary); }
@@ -97,6 +95,9 @@
     </style>
 </head>
 <body>
+
+<!-- كائن الصوت للألعاب النارية -->
+<audio id="fireworksAudio" src="https://assets.mixkit.co/active_storage/sfx/2012/2012-preview.mp3" preload="auto"></audio>
 
 <div id="loadingOverlay">
     <div class="spinner"></div>
@@ -441,37 +442,39 @@
             document.getElementById('outPercent').innerText = data.percent + "%";
             let p=parseFloat(data.percent);
             
-            // إضافة اللون الأخضر للتقديرات
             gradeEl.classList.add('grade-success-color');
-            
             if(p>=85) gradeEl.innerText="ممتاز";
             else if(p>=75) gradeEl.innerText="جيد جداً"; 
             else if(p>=65) gradeEl.innerText="جيد"; 
             else gradeEl.innerText="مقبول";
 
-            // إطلاق الألعاب النارية احتفالاً بالنجاح
             triggerCelebration();
         }
     }
 
     function triggerCelebration() {
+        // تشغيل صوت الألعاب النارية
+        const audio = document.getElementById('fireworksAudio');
+        audio.currentTime = 0;
+        audio.play().catch(e => console.log("الصوت يتطلب تفاعل المستخدم أولاً"));
+
         var duration = 3 * 1000;
         var end = Date.now() + duration;
 
         (function frame() {
           confetti({
-            particleCount: 3,
+            particleCount: 4,
             angle: 60,
             spread: 55,
             origin: { x: 0 },
-            colors: ['#1e3a8a', '#b45309', '#059669']
+            colors: ['#1e3a8a', '#b45309', '#059669', '#FFD700']
           });
           confetti({
-            particleCount: 3,
+            particleCount: 4,
             angle: 120,
             spread: 55,
             origin: { x: 1 },
-            colors: ['#1e3a8a', '#b45309', '#059669']
+            colors: ['#1e3a8a', '#b45309', '#059669', '#FFD700']
           });
 
           if (Date.now() < end) {
