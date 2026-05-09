@@ -34,6 +34,13 @@
         .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        .container::before, .container::after {
+            content: ""; position: absolute; top: 0; bottom: 0; width: 8px;
+            background: var(--primary); z-index: 0; border-radius: 10px; opacity: 0.8;
+        }
+        .container::before { right: -15px; }
+        .container::after { left: -15px; }
+
         .main-card { 
             background: var(--card); border-radius: 20px; padding: 20px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border);
@@ -73,18 +80,25 @@
         .stat-value { font-size: 22px; color: var(--primary); display: block; font-weight: 900; }
 
         .dev-footer-simple { text-align: center; margin-top: 30px; padding: 20px; color: #000; font-weight: 700; font-size: 15px; border-top: 1px solid #e2e8f0; }
+        .wish-text-inline { color: #e11d48; font-weight: 800; font-size: 13px; margin-right: 10px; vertical-align: middle; }
 
-        /* الرصد الجماعي - العناوين المطلوبة بكلمة "من" */
+        /* الرصد الجماعي - المسميات الجديدة */
         .bulk-row { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); position: relative; }
         .bulk-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 5px; margin-top: 10px; }
         .bulk-header-labels { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 5px; font-size: 11px; font-weight: bold; text-align: center; color: var(--primary); }
         .delete-btn { position: absolute; left: 10px; top: 10px; color: var(--danger); cursor: pointer; font-size: 18px; }
+
+        @media print {
+            .btn, .search-container, #adminPortal, .admin-tabs, .dev-footer-simple, .container::before, .container::after, #backToStatsBtn { display: none !important; }
+            #resultView { display: block !important; width: 100%; border: none; padding: 0; }
+        }
     </style>
 </head>
 <body>
 
 <div id="loadingOverlay">
     <div class="spinner"></div>
+    <p style="margin-top:15px; font-weight:900; color:var(--primary);">جاري جلب البيانات...</p>
 </div>
 
 <div class="container" id="searchSection">
@@ -96,7 +110,11 @@
         </div>
 
         <div class="search-container" id="searchBox" style="max-width:450px; margin:0 auto;">
-            <input type="number" id="searchID" placeholder="أدخل الرقم الوطني للطالبة...">
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                <label style="font-weight:800; margin-bottom:0;">الرقم الوطني للطالبة:</label>
+                <span class="wish-text-inline">بالتوفيق لجميع طالباتنا</span>
+            </div>
+            <input type="number" id="searchID" placeholder="أدخل الرقم هنا...">
             <button class="btn btn-primary" onclick="loadResult()"><i class="fas fa-search"></i> استخراج النتيجة</button>
         </div>
 
@@ -114,10 +132,10 @@
                 <thead>
                     <tr>
                         <th style="width: 26%;">المادة</th>
-                        <th>أعمال الطالب</th>
-                        <th>أعمال من</th>
-                        <th>امتحان الطالب</th>
-                        <th>امتحان من</th>
+                        <th>أعمال</th>
+                        <th>النهاية الصغرى</th>
+                        <th>امتحان</th>
+                        <th>النهاية الكبرى</th>
                         <th>المجموع</th>
                     </tr>
                 </thead>
@@ -253,8 +271,8 @@
                 const s = c.val();
                 html += `<div class="bulk-row" data-id="${c.key}">
                     <i class="fas fa-trash delete-btn" onclick="deleteStudent('${c.key}')"></i>
-                    <div style="font-weight:900; color:var(--primary); margin-bottom:10px;">${s.name}</div>
-                    <div class="bulk-header-labels"><span>المادة</span><span>أعمال الطالب</span><span>أعمال من</span><span>امتحان الطالب</span><span>امتحان من</span></div>`;
+                    <div style="font-weight:900; color:var(--primary); margin-bottom:10px;">${s.name} (${c.key})</div>
+                    <div class="bulk-header-labels"><span>المادة</span><span>أعمال من</span><span>من</span><span>امتحان من</span><span>من</span></div>`;
                 
                 schoolSubjects[yr].forEach(subName => {
                     const subData = (s.subjects && s.subjects[subName]) ? s.subjects[subName] : {wG:0, wM:40, eG:0, eM:60};
@@ -273,12 +291,21 @@
         });
     }
 
+    function deleteStudent(id) {
+        if(confirm("هل أنت متأكد من حذف هذه الطالبة نهائياً؟")) {
+            db.ref('students/'+id).remove().then(() => {
+                alert("تم الحذف بنجاح");
+                loadBulkStudentsList();
+            });
+        }
+    }
+
     function saveAllBulkData() {
         const rows = document.querySelectorAll('.bulk-row');
         let updates = {};
         rows.forEach(row => {
             const id = row.getAttribute('data-id');
-            const name = row.querySelector('div').innerText;
+            const name = row.querySelector('div').innerText.split(' (')[0];
             const yr = document.getElementById('bulkSelectYear').value;
             let subs = {}; let tG=0; let tM=0;
             
@@ -293,7 +320,7 @@
             });
             updates['students/'+id] = {name, year:yr, subjects:subs, totalGot:tG, totalMax:tM, percent:((tG/tM)*100).toFixed(1)};
         });
-        db.ref().update(updates).then(() => alert("تم الحفظ بنجاح"));
+        db.ref().update(updates).then(() => alert("تم حفظ جميع التعديلات بنجاح"));
     }
 
     function loadClassStats() {
@@ -345,11 +372,13 @@
         const sid=document.getElementById('searchID').value;
         if(!sid) return;
         document.getElementById('loadingOverlay').style.display='flex';
-        db.ref('students/'+sid).once('value', snap=>{ 
-            document.getElementById('loadingOverlay').style.display='none';
-            if(snap.exists()) showData(snap.val()); 
-            else { alert("الرقم غير مسجل"); }
-        });
+        setTimeout(() => {
+            db.ref('students/'+sid).once('value', snap=>{ 
+                document.getElementById('loadingOverlay').style.display='none';
+                if(snap.exists()) showData(snap.val()); 
+                else { alert("عذراً، الرقم غير مسجل."); location.reload(); }
+            });
+        }, 800);
     }
 
     function showData(data) {
@@ -369,7 +398,7 @@
         document.getElementById('resTbody').innerHTML=h;
         const gradeEl = document.getElementById('outGrade');
         if(hasFail) {
-            gradeEl.innerText = "لها دور ثانٍ"; gradeEl.className = "status-fail-text";
+            gradeEl.innerText = "لها دور ثانٍ"; gradeEl.className = "grade-fail";
             document.getElementById('totalRow').style.display="none"; document.getElementById('percentRow').style.display="none";
             document.getElementById('failMissions').style.display="block"; document.getElementById('failListItems').innerText = failed.join(' - ');
         } else {
@@ -378,8 +407,8 @@
             document.getElementById('outTotalSum').innerText = data.totalGot + " من " + data.totalMax;
             document.getElementById('outPercent').innerText = data.percent + "%";
             let p=parseFloat(data.percent);
-            if(p>=85) gradeEl.innerText="ممتاز"; else if(p>=75) gradeEl.innerText="جيد جداً"; else if(p>=65) gradeEl.innerText="جيد"; else gradeEl.innerText="مقبول";
-            gradeEl.className = "status-pass-text";
+            if(p>=85) { gradeEl.innerText="ممتاز"; gradeEl.className="grade-excellent"; }
+            else if(p>=75) gradeEl.innerText="جيد جداً"; else if(p>=65) gradeEl.innerText="جيد"; else gradeEl.innerText="مقبول";
         }
     }
 
@@ -410,7 +439,7 @@
             tG+=(wg+eg); tM+=(wm+em);
         });
         db.ref('students/'+id).set({name, year:yr, subjects:subs, totalGot:tG, totalMax:tM, percent:((tG/tM)*100).toFixed(1)})
-        .then(()=>alert("تم الحفظ بنجاح"));
+        .then(()=>alert("تم الحفظ"));
     }
 </script>
 </body>
