@@ -253,18 +253,31 @@
         const name = document.getElementById('inName').value;
         const yr = document.getElementById('inYear').value;
         
-        if(!id || !name || !yr) return alert("يرجى إكمال جميع البيانات (الاسم، الرقم، الصف)");
+        if(!id || !name || !yr) return alert("يرجى إكمال البيانات الأساسية (الاسم، الرقم، الصف)");
 
         let subs = {}; let tS = 0; let tM = 0;
         document.querySelectorAll('.m-name').forEach((nEl) => {
             const n = nEl.value;
             const parent = nEl.parentElement;
-            const wg = parseFloat(parent.querySelector('.m-w-got').value) || 0;
-            const wm = parseFloat(parent.querySelector('.m-w-max').value) || 0;
-            const eg = parseFloat(parent.querySelector('.m-e-got').value) || 0;
-            const em = parseFloat(parent.querySelector('.m-e-max').value) || 0;
+            const wgRaw = parent.querySelector('.m-w-got').value;
+            const wmRaw = parent.querySelector('.m-w-max').value;
+            const egRaw = parent.querySelector('.m-e-got').value;
+            const emRaw = parent.querySelector('.m-e-max').value;
+            
+            const wg = parseFloat(wgRaw) || 0;
+            const wm = parseFloat(wmRaw) || 0;
+            const eg = parseFloat(egRaw) || 0;
+            const em = parseFloat(emRaw) || 0;
+
             if(n) {
-                subs[n] = {wG: wg, wM: wm, eG: eg, eM: em, sum: (wg + eg), max: (wm + em)};
+                subs[n] = {
+                    wG: wgRaw === "" ? "" : wg,
+                    wM: wmRaw === "" ? 40 : wm,
+                    eG: egRaw === "" ? "" : eg,
+                    eM: emRaw === "" ? 60 : em,
+                    sum: (wg + eg),
+                    max: (wm + em)
+                };
                 tS += (wg + eg); tM += (wm + em);
             }
         });
@@ -273,7 +286,7 @@
             name: name,
             year: yr,
             subjects: subs,
-            percent: ((tS / tM) * 100).toFixed(1),
+            percent: tM > 0 ? ((tS / tM) * 100).toFixed(1) : 0,
             totalGot: tS,
             totalMax: tM
         }).then(() => {
@@ -324,10 +337,10 @@
                 const wm = parseFloat(grid.querySelector('.bw-m').value) || 0;
                 const eg = parseFloat(grid.querySelector('.be-g').value) || 0;
                 const em = parseFloat(grid.querySelector('.be-m').value) || 0;
-                subs[n] = {wG:wg, wM:wm, eG:eg, eM:em, sum:(wg+eg), max:(wm+em)};
+                subs[n] = {wG:grid.querySelector('.bw-g').value, wM:wm, eG:grid.querySelector('.be-g').value, eM:em, sum:(wg+eg), max:(wm+em)};
                 tS += (wg+eg); tM += (wm+em);
             });
-            await db.ref('students/'+sid).update({subjects:subs, totalGot:tS, totalMax:tM, percent:((tS/tM)*100).toFixed(1)});
+            await db.ref('students/'+sid).update({subjects:subs, totalGot:tS, totalMax:tM, percent:tM > 0 ? ((tS/tM)*100).toFixed(1) : 0});
         }
         alert("تم حفظ جميع البيانات بنجاح");
     }
@@ -365,7 +378,7 @@
         sortedKeys.forEach(k => {
             if(data.subjects[k]) {
                 const s = data.subjects[k]; 
-                const isFail = s.sum < (s.max/2);
+                const isFail = (s.wG !== "" && s.eG !== "") && (s.sum < (s.max/2));
                 if(isFail) { hasFail=true; failed.push(k); }
                 h+=`<tr><td>${k}</td><td>${s.wG}</td><td>${s.wM}</td><td>${s.eG}</td><td>${s.eM}</td><td style="color:${isFail?'red':'black'}">${s.sum}</td></tr>`;
             }
