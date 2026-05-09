@@ -10,7 +10,6 @@
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <!-- مكتبة الألعاب النارية -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -96,8 +95,8 @@
 </head>
 <body>
 
-<!-- تم استبدال الرابط بصوت ألعاب نارية احترافي -->
-<audio id="fireworksAudio" src="https://assets.mixkit.co/active_storage/sfx/2012/2012-preview.mp3" preload="auto"></audio>
+<!-- صوت ألعاب نارية مباشر وموثوق -->
+<audio id="fireworksAudio" src="https://www.soundjay.com/misc/sounds/firework-show-01.mp3" preload="auto"></audio>
 
 <div id="loadingOverlay">
     <div class="spinner"></div>
@@ -456,21 +455,21 @@
         // تشغيل صوت الألعاب النارية
         const audio = document.getElementById('fireworksAudio');
         audio.currentTime = 0;
-        audio.play().catch(e => console.log("الصوت يتطلب تفاعل المستخدم"));
+        audio.play().catch(e => console.warn("ملاحظة: المتصفح يتطلب تفاعل المستخدم لتشغيل الصوت للمرة الأولى."));
 
-        var duration = 3 * 1000;
+        var duration = 4 * 1000;
         var end = Date.now() + duration;
 
         (function frame() {
           confetti({
-            particleCount: 4,
+            particleCount: 5,
             angle: 60,
             spread: 55,
             origin: { x: 0 },
             colors: ['#1e3a8a', '#b45309', '#059669', '#FFD700']
           });
           confetti({
-            particleCount: 4,
+            particleCount: 5,
             angle: 120,
             spread: 55,
             origin: { x: 1 },
