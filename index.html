@@ -88,14 +88,13 @@
         .delete-btn { position: absolute; left: 10px; top: 10px; color: var(--danger); cursor: pointer; font-size: 18px; }
 
         @media print {
-            .btn, .search-container, #adminPortal, .admin-tabs, .dev-footer-simple, .container::before, .container::after, #backToStatsBtn { display: none !important; }
+            .btn, .search-container, #adminPortal, .admin-tabs, .dev-footer-simple, .container::before, .container::after, #backToStatsBtn, .school-header { display: none !important; }
             #resultView { display: block !important; width: 100%; border: none; padding: 0; }
         }
     </style>
 </head>
 <body>
 
-<!-- صوت ألعاب نارية مباشر وموثوق -->
 <audio id="fireworksAudio" src="https://www.soundjay.com/misc/sounds/firework-show-01.mp3" preload="auto"></audio>
 
 <div id="loadingOverlay">
@@ -105,19 +104,22 @@
 
 <div class="container" id="searchSection">
     <div class="main-card">
-        <div class="school-header" style="text-align:center; margin-bottom:20px;">
-            <div class="school-icon" style="font-size:40px; color:var(--primary); cursor:pointer;" ondblclick="enterAdmin()"><i class="fas fa-school"></i></div>
-            <h1 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--primary);">منظومة نتائج الاستقلال</h1>
-            <p style="color: #64748b; font-weight: 700; font-size: 14px;">نتائج الامتحانات 2026</p>
-        </div>
-
-        <div class="search-container" id="searchBox" style="max-width:450px; margin:0 auto;">
-            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                <label style="font-weight:800; margin-bottom:0;">الرقم الوطني للطالبة:</label>
-                <span class="wish-text-inline">بالتوفيق لجميع طالباتنا</span>
+        <!-- قسم الهيدر والبحث سيختفي عند عرض النتيجة -->
+        <div id="welcomeArea">
+            <div class="school-header" style="text-align:center; margin-bottom:20px;">
+                <div class="school-icon" style="font-size:40px; color:var(--primary); cursor:pointer;" ondblclick="enterAdmin()"><i class="fas fa-school"></i></div>
+                <h1 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--primary);">منظومة نتائج الاستقلال</h1>
+                <p style="color: #64748b; font-weight: 700; font-size: 14px;">نتائج الامتحانات 2026</p>
             </div>
-            <input type="number" id="searchID" placeholder="أدخل الرقم هنا...">
-            <button class="btn btn-primary" onclick="loadResult()"><i class="fas fa-search"></i> استخراج النتيجة</button>
+
+            <div class="search-container" id="searchBox" style="max-width:450px; margin:0 auto;">
+                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                    <label style="font-weight:800; margin-bottom:0;">الرقم الوطني للطالبة:</label>
+                    <span class="wish-text-inline">بالتوفيق لجميع طالباتنا</span>
+                </div>
+                <input type="number" id="searchID" placeholder="أدخل الرقم هنا...">
+                <button class="btn btn-primary" onclick="loadResult()"><i class="fas fa-search"></i> استخراج النتيجة</button>
+            </div>
         </div>
 
         <div id="resultView">
@@ -386,7 +388,7 @@
     function viewFromStats(id) {
         document.getElementById('adminPortal').style.display='none';
         document.getElementById('searchSection').style.display='block';
-        document.getElementById('searchBox').style.display='none';
+        document.getElementById('welcomeArea').style.display='none'; // إخفاء البحث عند العرض من الإحصائيات
         document.getElementById('backToStatsBtn').style.display='flex';
         document.getElementById('searchID').value = id;
         loadResult();
@@ -396,7 +398,7 @@
         document.getElementById('resultView').style.display='none';
         document.getElementById('searchSection').style.display='none';
         document.getElementById('adminPortal').style.display='block';
-        document.getElementById('searchBox').style.display='block';
+        document.getElementById('welcomeArea').style.display='block'; // استعادة البحث
         document.getElementById('backToStatsBtn').style.display='none';
         showTab('statsTab', document.getElementById('statsTabBtn'));
     }
@@ -415,7 +417,10 @@
     }
 
     function showData(data) {
+        // إخفاء منطقة الترحيب والبحث تماماً عند ظهور النتيجة
+        document.getElementById('welcomeArea').style.display = 'none';
         document.getElementById('resultView').style.display='block';
+        
         document.getElementById('outName').innerText = data.name;
         document.getElementById('outYear').innerText = "الصف: " + data.year;
         let h=""; let failed=[]; let hasFail=false;
@@ -452,10 +457,9 @@
     }
 
     function triggerCelebration() {
-        // تشغيل صوت الألعاب النارية
         const audio = document.getElementById('fireworksAudio');
         audio.currentTime = 0;
-        audio.play().catch(e => console.warn("ملاحظة: المتصفح يتطلب تفاعل المستخدم لتشغيل الصوت للمرة الأولى."));
+        audio.play().catch(e => console.warn("ملاحظة: المتصفح يتطلب تفاعل المستخدم لتشغيل الصوت."));
 
         var duration = 4 * 1000;
         var end = Date.now() + duration;
