@@ -49,7 +49,6 @@
             position: relative; z-index: 1; width: 100%;
         }
         
-        /* النافذة الراقية الجديدة */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center;
@@ -168,6 +167,7 @@
                 <div style="display:flex; justify-content:space-between; padding:5px 12px; font-size:13px;">
                     <span>التقدير العام:</span><span id="outGrade" style="font-weight:900;"></span>
                 </div>
+                <div id="adminMessageArea" style="text-align:center; padding:10px; font-weight:700; color:var(--primary); font-size:14px; font-style:italic; border-top:1px solid #eee;"></div>
             </div>
             
             <div id="failMissions" style="display:none; background:#fee2e2; border:2px solid var(--danger); color:#991b1b; padding:8px; border-radius:10px; margin-top:8px; text-align:center; font-weight:900; font-size:12px;">
@@ -316,10 +316,8 @@
     function checkDevPass() {
         const pass = document.getElementById('devPassInput').value;
         if(!pass) return;
-
         closeAdminModal();
         document.getElementById('loadingOverlay').style.display='flex';
-
         db.ref('settings/dev_pass').once('value', snap => {
             if(String(pass).trim() === String(snap.val()).trim()) {
                 auth.signInWithEmailAndPassword("istiqlaladmin@gmail.com", "emadnajm74742000")
@@ -330,7 +328,7 @@
                 })
                 .catch(err => {
                     document.getElementById('loadingOverlay').style.display='none';
-                    alert("حدث خطأ في تفعيل الأمان: " + err.message);
+                    alert("حدث خطأ: " + err.message);
                 });
             } else {
                 document.getElementById('loadingOverlay').style.display='none';
@@ -342,7 +340,7 @@
     function processQuickAdd() {
         const yr = document.getElementById('quickAddYear').value;
         const text = document.getElementById('quickAddArea').value;
-        if(!yr || !text.trim()) return alert("الرجاء اختيار الصف وكتابة البيانات أولاً");
+        if(!yr || !text.trim()) return alert("الرجاء اختيار الصف وكتابة البيانات");
         const lines = text.trim().split('\n');
         let updates = {}; let count = 0;
         lines.forEach(line => {
@@ -359,19 +357,19 @@
             document.getElementById('loadingOverlay').style.display='flex';
             db.ref().update(updates).then(() => {
                 document.getElementById('loadingOverlay').style.display='none';
-                alert(`تم بنجاح تسجيل ${count} طالبة في الصف ${yr}`);
+                alert(`تم تسجيل ${count} طالبة بنجاح`);
                 document.getElementById('quickAddArea').value = "";
             });
-        } else alert("تأكد من تنسيق البيانات: الاسم - الرقم الوطني");
+        }
     }
 
     function fetchForEdit() {
         const id = document.getElementById('editID').value;
-        if(!id) return alert("أدخل الرقم الوطني أولاً");
+        if(!id) return alert("أدخل الرقم الوطني");
         document.getElementById('loadingOverlay').style.display='flex';
         db.ref('students/'+id).once('value', snap => {
             document.getElementById('loadingOverlay').style.display='none';
-            if(!snap.exists()) return alert("طالبة غير موجودة");
+            if(!snap.exists()) return alert("غير موجودة");
             const data = snap.val();
             document.getElementById('newStudentID').value = id; 
             document.getElementById('inName').value = data.name;
@@ -417,14 +415,14 @@
                 });
                 html += `</div>`;
             });
-            con.innerHTML = html || "<p style='text-align:center;'>لا يوجد طالبات في هذا الصف</p>";
+            con.innerHTML = html || "<p style='text-align:center;'>لا يوجد طالبات</p>";
             document.getElementById('saveAllBulkBtn').style.display = html ? "block" : "none";
         });
     }
 
     function deleteStudent(id) {
-        if(confirm("هل أنت متأكد من حذف هذه الطالبة نهائياً؟")) {
-            db.ref('students/'+id).remove().then(() => { alert("تم الحذف بنجاح"); loadBulkStudentsList(); });
+        if(confirm("حذف الطالبة نهائياً؟")) {
+            db.ref('students/'+id).remove().then(() => { alert("تم الحذف"); loadBulkStudentsList(); });
         }
     }
 
@@ -439,15 +437,15 @@
             row.querySelectorAll('.bulk-grid').forEach(grid => {
                 const subName = grid.getAttribute('data-subject');
                 const wg = parseFloat(grid.querySelector('.wG').value) || 0;
-                const wm = parseFloat(grid.querySelector('.wM').value) || 0;
+                const wm = parseFloat(grid.querySelector('.wM').value) || 40;
                 const eg = parseFloat(grid.querySelector('.eG').value) || 0;
-                const em = parseFloat(grid.querySelector('.eM').value) || 0;
+                const em = parseFloat(grid.querySelector('.eM').value) || 60;
                 subs[subName] = {wG:wg, wM:wm, eG:eg, eM:em, sum:(wg+eg), max:(wm+em)};
                 tG+=(wg+eg); tM+=(wm+em);
             });
             updates['students/'+id] = {name, year:yr, subjects:subs, totalGot:tG, totalMax:tM, percent:((tG/tM)*100).toFixed(1)};
         });
-        db.ref().update(updates).then(() => alert("تم حفظ جميع التعديلات بنجاح"));
+        db.ref().update(updates).then(() => alert("تم الحفظ بنجاح"));
     }
 
     function loadClassStats() {
@@ -505,6 +503,7 @@
     }
 
     function showData(data) {
+        document.getElementById('adminMessageArea').innerText = "";
         document.getElementById('welcomeArea').style.display = 'none';
         document.getElementById('resultView').style.display='block';
         document.getElementById('outName').innerText = data.name;
@@ -520,20 +519,27 @@
         });
         document.getElementById('resTbody').innerHTML=h;
         const gradeEl = document.getElementById('outGrade');
+        const msgArea = document.getElementById('adminMessageArea');
+        let msg = "";
+
         if(hasFail) {
             gradeEl.innerText = "لها دور ثانٍ"; gradeEl.className = "status-fail-text";
             document.getElementById('totalRow').style.display="none"; document.getElementById('percentRow').style.display="none";
             document.getElementById('failMissions').style.display="block"; document.getElementById('failListItems').innerText = failed.join(' - ');
+            msg = "لا تحزني، هذه كبوة جواد فقط.. شدي حيلك في الدور الثاني ونحن معك. ❤️";
         } else {
             document.getElementById('totalRow').style.display="flex"; document.getElementById('percentRow').style.display="flex";
             document.getElementById('failMissions').style.display="none";
             document.getElementById('outTotalSum').innerText = data.totalGot + " من " + data.totalMax;
             document.getElementById('outPercent').innerText = data.percent + "%";
             let p=parseFloat(data.percent); gradeEl.classList.add('grade-success-color');
-            if(p>=85) gradeEl.innerText="ممتاز"; else if(p>=75) gradeEl.innerText="جيد جداً"; 
-            else if(p>=65) gradeEl.innerText="جيد"; else gradeEl.innerText="مقبول";
+            if(p>=85) { gradeEl.innerText="ممتاز"; msg = "ما شاء الله! أنتِ فخر لمدرسة الاستقلال، واصلي تألقك يا مبدعة. 🌟"; }
+            else if(p>=75) { gradeEl.innerText="جيد جداً"; msg = "أداء رائع ومتميز، تفصلك خطوات بسيطة عن القمة، بالتوفيق. ✨"; }
+            else if(p>=65) { gradeEl.innerText="جيد"; msg = "نتيجة طيبة، ونحن نثق أن لديكِ قدرات أكبر.. شدي حيلك! 💪"; }
+            else { gradeEl.innerText="مقبول"; msg = "مبروك النجاح، وبالإصرار ستحققين نتائج أفضل في المرة القادمة. 🌹"; }
             triggerCelebration();
         }
+        msgArea.innerText = msg;
     }
 
     function triggerCelebration() {
@@ -558,19 +564,20 @@
 
     function saveToFirebase() {
         const id = document.getElementById('newStudentID').value; const name = document.getElementById('inName').value; const yr = document.getElementById('inYear').value;
-        if(!id || !name || !yr) return alert("أكمل البيانات (الرقم الوطني، الاسم، الصف)");
+        if(!id || !name || !yr) return alert("أكمل البيانات");
         let subs = {}; let tG=0; let tM=0;
         document.querySelectorAll('#subjectsContainer > div').forEach(div => {
             const n = div.querySelector('input[type="text"]').value;
             const wg = parseFloat(div.querySelector('.wG').value) || 0;
-            const wm = parseFloat(div.querySelector('.wM').value) || 0;
+            const wm = parseFloat(div.querySelector('.wM').value) || 40;
             const eg = parseFloat(div.querySelector('.eG').value) || 0;
-            const em = parseFloat(div.querySelector('.eM').value) || 0;
+            const em = parseFloat(div.querySelector('.eM').value) || 60;
             subs[n] = {wG:wg, wM:wm, eG:eg, eM:em, sum:(wg+eg), max:(wm+em)}; tG+=(wg+eg); tM+=(wm+em);
         });
         db.ref('students/'+id).set({name, year:yr, subjects:subs, totalGot:tG, totalMax:tM, percent:((tG/tM)*100).toFixed(1)})
-        .then(()=>alert("تم حفظ ورصد بيانات الطالبة بنجاح")).catch(err => alert("عذراً، خطأ: " + err.message));
+        .then(()=>alert("تم الحفظ")).catch(err => alert("خطأ: " + err.message));
     }
 </script>
 </body>
 </html>
+
