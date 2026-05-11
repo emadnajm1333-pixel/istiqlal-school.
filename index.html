@@ -5,13 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مدرسة الاستقلال للتعليم الأساسي</title>
     
-    <!-- وسوم Facebook Meta Tags لتحسين ظهور الرابط -->
-    <meta property="og:title" content="مدرسة الاستقلال للتعليم الأساسي">
-    <meta property="og:description" content="منظومة نتائج الامتحانات 2026 - تم تطويره بواسطة عماد الدين نجم">
-    <meta property="og:image" content="https://ajm1333-pixel.github.io/1000255629.jpg">
-    <meta property="og:url" content="https://ajm1333-pixel.github.io/">
-    <meta property="og:type" content="website">
-
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -62,7 +55,7 @@
         .admin-section { display: none; }
         .admin-section.active { display: block; }
 
-        input, select { width: 100%; padding: 8px; border-radius: 10px; border: 2px solid var(--border); background: #f8fafc; outline: none; font-size: 14px; margin-bottom: 8px; text-align: center; }
+        input, select, textarea { width: 100%; padding: 8px; border-radius: 10px; border: 2px solid var(--border); background: #f8fafc; outline: none; font-size: 14px; margin-bottom: 8px; text-align: center; }
         .btn { width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; }
         .btn-primary { background: var(--primary); color: white; }
         
@@ -183,6 +176,7 @@
         <div class="admin-tabs">
             <button class="tab-btn active" onclick="showTab('individualTab', this)">الرصد الفردي</button>
             <button class="tab-btn" onclick="showTab('bulkTab', this)">الرصد الجماعي</button>
+            <button class="tab-btn" onclick="showTab('quickAddTab', this)">إضافة جماعية</button>
             <button class="tab-btn" id="statsTabBtn" onclick="showTab('statsTab', this)">إحصائيات الصفوف</button>
         </div>
 
@@ -215,6 +209,21 @@
             </select>
             <div id="bulkStudentsContainer"></div>
             <button id="saveAllBulkBtn" class="btn" style="display:none; background:var(--success); color:white; margin-top:15px;" onclick="saveAllBulkData()">حفظ الكل</button>
+        </div>
+
+        <!-- القسم الجديد المضاف: الإضافة الجماعية -->
+        <div id="quickAddTab" class="admin-section">
+            <div style="background:#f0f9ff; padding:15px; border-radius:12px; border:2px solid var(--primary);">
+                <h3 style="color:var(--primary); text-align:center; margin-top:0;">إضافة طالبات دفعة واحدة</h3>
+                <p style="text-align:center; font-size:12px; font-weight:bold; color:#475569;">اكتب (الاسم - الرقم الوطني) كل طالبة في سطر</p>
+                <select id="quickAddYear">
+                    <option value="">-- اختر الصف --</option>
+                    <option value="خامس">خامس</option><option value="سادس">سادس</option>
+                    <option value="سابع">سابع</option><option value="ثامن">ثامن</option>
+                </select>
+                <textarea id="quickAddArea" rows="12" style="text-align:right;" placeholder="مثال:&#10;نورة محمد سالم - 120050607080&#10;مريم علي الفيتوري - 120060504030"></textarea>
+                <button class="btn btn-primary" onclick="processQuickAdd()"><i class="fas fa-save"></i> حفظ الطالبات في المنظومة</button>
+            </div>
         </div>
 
         <div id="statsTab" class="admin-section">
@@ -273,6 +282,47 @@
                 document.getElementById('adminPortal').style.display='block';
             }
         });
+    }
+
+    // دالة الإضافة الجماعية الجديدة
+    function processQuickAdd() {
+        const yr = document.getElementById('quickAddYear').value;
+        const text = document.getElementById('quickAddArea').value;
+        if(!yr || !text.trim()) return alert("الرجاء اختيار الصف وكتابة البيانات أولاً");
+
+        const lines = text.trim().split('\n');
+        let updates = {};
+        let count = 0;
+
+        lines.forEach(line => {
+            const parts = line.split(/[-،,]/);
+            if(parts.length >= 2) {
+                const name = parts[0].trim();
+                const id = parts[1].trim();
+                
+                let subs = {};
+                schoolSubjects[yr].forEach(s => {
+                    subs[s] = {wG:0, wM:40, eG:0, eM:60, sum:0, max:100};
+                });
+
+                updates['students/'+id] = {
+                    name: name, year: yr, subjects: subs, 
+                    totalGot: 0, totalMax: schoolSubjects[yr].length * 100, percent: "0.0"
+                };
+                count++;
+            }
+        });
+
+        if(count > 0) {
+            document.getElementById('loadingOverlay').style.display='flex';
+            db.ref().update(updates).then(() => {
+                document.getElementById('loadingOverlay').style.display='none';
+                alert(`تم بنجاح تسجيل ${count} طالبة في الصف ${yr}`);
+                document.getElementById('quickAddArea').value = "";
+            });
+        } else {
+            alert("تأكد من تنسيق البيانات: الاسم - الرقم الوطني");
+        }
     }
 
     function fetchForEdit() {
