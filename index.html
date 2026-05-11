@@ -526,7 +526,7 @@
             gradeEl.innerText = "لها دور ثانٍ"; gradeEl.className = "status-fail-text";
             document.getElementById('totalRow').style.display="none"; document.getElementById('percentRow').style.display="none";
             document.getElementById('failMissions').style.display="block"; document.getElementById('failListItems').innerText = failed.join(' - ');
-            msg = "لا تحزني، هذه كبوة جواد فقط.. شدي حيلك في الدور الثاني ونحن معك. ❤️";
+            msg = "لكل جواد كبوة، ونحن بانتظار عودتكِ للنجاح في الدور الثاني بإذن الله. ❤️";
         } else {
             document.getElementById('totalRow').style.display="flex"; document.getElementById('percentRow').style.display="flex";
             document.getElementById('failMissions').style.display="none";
@@ -535,7 +535,7 @@
             let p=parseFloat(data.percent); gradeEl.classList.add('grade-success-color');
             if(p>=85) { gradeEl.innerText="ممتاز"; msg = "ما شاء الله! أنتِ فخر لمدرسة الاستقلال، واصلي تألقك يا مبدعة. 🌟"; }
             else if(p>=75) { gradeEl.innerText="جيد جداً"; msg = "أداء رائع ومتميز، تفصلك خطوات بسيطة عن القمة، بالتوفيق. ✨"; }
-            else if(p>=65) { gradeEl.innerText="جيد"; msg = "نتيجة طيبة، ونحن نثق أن لديكِ قدرات أكبر.. شدي حيلك! 💪"; }
+            else if(p>=65) { gradeEl.innerText="جيد"; msg = "نتيجة طيبة، ونحن نثق أن لديكِ قدرات أكبر.. بالتّوفيق! 💪"; }
             else { gradeEl.innerText="مقبول"; msg = "مبروك النجاح، وبالإصرار ستحققين نتائج أفضل في المرة القادمة. 🌹"; }
             triggerCelebration();
         }
