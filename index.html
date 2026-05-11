@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script> <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -97,6 +97,7 @@
 
 <div id="loadingOverlay">
     <div class="spinner"></div>
+    <div id="loadingText" style="margin-top:10px; font-weight:900; color:var(--primary);">جاري التحقق...</div>
 </div>
 
 <div class="container" id="searchSection">
@@ -135,9 +136,9 @@
                     <tr>
                         <th style="width: 26%;">المادة</th>
                         <th>أعمال</th>
-                        <th>النهاية الصغرى</th>
+                        <th>الصغرى</th>
                         <th>امتحان</th>
-                        <th>النهاية الكبرى</th>
+                        <th>الكبرى</th>
                         <th>المجموع</th>
                     </tr>
                 </thead>
@@ -258,6 +259,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    const auth = firebase.auth();
 
     const schoolSubjects = {
         "خامس": ["التربية الإسلامية", "الحاسوب", "الرياضيات", "العلوم", "الكتابة", "اللغة الإنجليزية", "الاجتماعيات", "اللغة العربية"],
@@ -273,12 +275,30 @@
         btn.classList.add('active');
     }
 
+    // الدالة المعدلة لربط رمز المطور بحساب Firebase (الأمان الجديد)
     function enterAdmin() {
         const pass = prompt("رمز المطور:");
+        if(!pass) return;
+
+        document.getElementById('loadingOverlay').style.display='flex';
+
         db.ref('settings/dev_pass').once('value', snap => {
             if(String(pass).trim() === String(snap.val()).trim()) {
-                document.getElementById('searchSection').style.display='none';
-                document.getElementById('adminPortal').style.display='block';
+                // تسجيل دخول صامت بالحساب الجديد
+                // استبدل Istiqlal@2026 بالباسوورد الحقيقي الخاص بك
+                auth.signInWithEmailAndPassword("istiqlaladmin@gmail.com", "emadnajm74742000")
+                .then(() => {
+                    document.getElementById('loadingOverlay').style.display='none';
+                    document.getElementById('searchSection').style.display='none';
+                    document.getElementById('adminPortal').style.display='block';
+                })
+                .catch(err => {
+                    document.getElementById('loadingOverlay').style.display='none';
+                    alert("حدث خطأ في تفعيل الأمان: " + err.message);
+                });
+            } else {
+                document.getElementById('loadingOverlay').style.display='none';
+                alert("رمز المطور غير صحيح!");
             }
         });
     }
@@ -352,7 +372,6 @@
         });
     }
 
-    // تم تعديل هذه الدالة لتقوم بالترتيب الأبجدي تلقائياً
     function loadBulkStudentsList() {
         const yr = document.getElementById('bulkSelectYear').value;
         const con = document.getElementById('bulkStudentsContainer');
@@ -362,13 +381,11 @@
         db.ref('students').orderByChild('year').equalTo(yr).once('value', snap => {
             document.getElementById('loadingOverlay').style.display='none';
             
-            // تحويل البيانات لمصفوفة لسهولة الترتيب
             let studentsList = [];
             snap.forEach(c => {
                 studentsList.push({ key: c.key, data: c.val() });
             });
 
-            // الترتيب الأبجدي بناءً على الاسم
             studentsList.sort((a, b) => a.data.name.localeCompare(b.data.name, 'ar'));
 
             let html = "";
@@ -437,7 +454,6 @@
             let students = []; let passed = 0; let failed = 0;
             snap.forEach(c => { students.push({id: c.key, ...c.val()}); });
             
-            // ترتيب أبجدي في الإحصائيات أيضاً
             students.sort((a,b) => a.name.localeCompare(b.name, 'ar'));
             
             let rows = "";
@@ -575,7 +591,8 @@
             tG+=(wg+eg); tM+=(wm+em);
         });
         db.ref('students/'+id).set({name, year:yr, subjects:subs, totalGot:tG, totalMax:tM, percent:((tG/tM)*100).toFixed(1)})
-        .then(()=>alert("تم حفظ ورصد بيانات الطالبة بنجاح"));
+        .then(()=>alert("تم حفظ ورصد بيانات الطالبة بنجاح"))
+        .catch(err => alert("عذراً، لا تملك صلاحية الحفظ: " + err.message));
     }
 </script>
 </body>
