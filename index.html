@@ -635,6 +635,7 @@ document.getElementById('resTbody').innerHTML = h;
           confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#1e3a8a', '#b45309', '#059669', '#FFD700'] });
           if (Date.now() < end) requestAnimationFrame(frame);
         }());
+        
     }
 
     function autoFillSubjects() {
@@ -662,7 +663,6 @@ document.getElementById('resTbody').innerHTML = h;
         });
         db.ref('students/'+id).set({name, year:yr, subjects:subs, totalGot:tG, totalMax:tM, percent:((tG/tM)*100).toFixed(1)})
         .then(()=>alert("تم الحفظ")).catch(err => alert("خطأ: " + err.message));
-    }
 </script>
     <style>
     .whatsapp-float {
