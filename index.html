@@ -74,12 +74,31 @@
         
         #resultView { display: none; margin-top: 5px; padding: 2px; border-radius: 12px; background: #fff; }
         
-        .res-table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid var(--border); margin-bottom: 5px; }
-        .res-table th { 
-            background: var(--primary); color: white; padding: 4px 1px; font-size: 9px; border: 1px solid #fff;
-            line-height: 1.1; word-wrap: break-word; vertical-align: middle;
-        }
-        .res-table td { padding: 4px 1px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; color: #000; font-size: 11px; overflow: hidden; }
+        .cert-table {
+    width: 100%;
+    border-collapse: collapse;
+    direction: rtl;
+    background: #fff;
+    border: 1.5px solid #000; /* حدود سوداء واضحة مثل الكشوفات الرسمية */
+}
+
+.cert-table th, .cert-table td {
+    border: 1px solid #000;
+    text-align: center;
+    vertical-align: middle;
+    padding: 4px;
+    font-size: 11px;
+    font-weight: 900;
+    color: #000;
+}
+
+.header-bg { background-color: #f2f2f2; }
+.subject-col { width: 16%; }
+.details-col { width: 12%; font-size: 10px; }
+.score-col { width: 8%; }
+.thin-col { width: 6%; }
+.cert-table tr { height: 32px; }
+
 
         .summary-box { margin-top: 0; border: 2px solid var(--primary); background: #f8fafc; border-radius: 0 0 10px 10px; }
         .status-pass-text { color: var(--success) !important; font-weight: 900; }
@@ -143,28 +162,34 @@
                 <div id="outYear" style="color: var(--accent); font-weight: 800; font-size: 13px; margin-top: 1px;"></div>
             </div>
             
-            <table class="res-table">
-                <thead>
-                    <tr>
-                        <th rowspan="2" style="width: 25%;">المادة</th>
-                        <th colspan="4">الفصل الأول</th>
-                        <th colspan="4">الفصل الثاني</th>
-                        <th rowspan="2">النهاية الكبرى</th>
-                        <th rowspan="2">المجموع</th>
-                    </tr>
-                    <tr>
-                        <th>أعمال</th>
-                        <th>من</th>
-                        <th>امتحان</th>
-                        <th>من</th>
-                        <th>أعمال</th>
-                        <th>من</th>
-                        <th>امتحان</th>
-                        <th>من</th>
-                    </tr>
-                </thead>
-                <tbody id="resTbody"></tbody>
-            </table>
+            <table class="cert-table">
+    <thead>
+        <tr class="header-bg">
+            <th rowspan="3" class="subject-col">المواد الدراسية</th>
+            <th rowspan="3" class="thin-col">عدد الحصص</th>
+            <th colspan="4">درجة الفصلين</th>
+            <th colspan="3">النتيجة النهائية للتلميذ</th>
+            <th rowspan="3" class="thin-col">نتيجة الدور الثاني</th>
+        </tr>
+        <tr class="header-bg">
+            <th rowspan="2" class="details-col">التفاصيل</th>
+            <th rowspan="2" class="score-col">الدرجة المقررة لكل فصل</th>
+            <th colspan="2">درجة التلميذ</th>
+            <th rowspan="2" class="score-col">مجموع الفصلين</th>
+            <th colspan="2">النهائيات</th>
+        </tr>
+        <tr class="header-bg">
+            <th>الفصل الأول</th>
+            <th>الفصل الثاني</th>
+            <th class="thin-col">الكبرى</th>
+            <th class="thin-col">الصغرى</th>
+        </tr>
+    </thead>
+    <tbody id="resTbody">
+        <!-- هنا سيتم عرض الدرجات برمجياً -->
+    </tbody>
+</table>
+
 
             <div class="summary-box">
                 <div id="totalRow" style="display:flex; justify-content:space-between; padding:5px 12px; border-bottom:1px solid #e2e8f0; font-size:13px;">
@@ -511,33 +536,51 @@
         });
     }
 
-    // الدالة المعدلة لعرض الفصول
     function showData(data) {
         document.getElementById('adminMessageArea').innerText = "";
         document.getElementById('welcomeArea').style.display = 'none';
         document.getElementById('resultView').style.display='block';
         document.getElementById('outName').innerText = data.name;
         document.getElementById('outYear').innerText = "الصف: " + data.year;
-        let h=""; let failed=[]; let hasFail=false;
-        const sortedKeys = schoolSubjects[data.year] || Object.keys(data.subjects);
-        sortedKeys.forEach(k => {
-            if(data.subjects[k]) {
-                const s = data.subjects[k]; const isFail = s.sum < (s.max/2);
-                if(isFail) { hasFail=true; failed.push(k); }
-                
-                // معادلة تقسيم الدرجات للفصول
-                const f1w = (s.wG / 2).toFixed(1);
-                const f1e = (s.eG / 2).toFixed(1);
-                const f2w = (s.wG - f1w).toFixed(1);
-                const f2e = (s.eG - f1e).toFixed(1);
+        let h = "";
+const subjects = data.subjects;
 
-                h+=`<tr>
-                    <td style="text-align:right; padding-right:8px;">${k}</td>
-                    <td>${f1w}</td><td>${f1e}</td><td>${f2w}</td><td>${f2e}</td>
-                    <td style="color:${isFail?'red':'black'}">${s.sum}</td>
-                </tr>`;
-            }
-        });
+for (let name in subjects) {
+    let s = subjects[name];
+    
+    // تقسيم الدرجة المقررة (النهائية الكبرى لكل فصل)
+    let wMax = (s.wM / 2); 
+    let eMax = (s.eM / 2); 
+    
+    // تقسيم درجات الطالب (مثال: نصف الدرجة للفصل الأول والنصف للثاني)
+    let f1_w = (s.wG / 2).toFixed(0);
+    let f1_e = (s.eG / 2).toFixed(0);
+    let f2_w = (s.wG - f1_w).toFixed(0);
+    let f2_e = (s.eG - f1_e).toFixed(0);
+
+    h += `
+        <tr>
+            <td rowspan="2">${name}</td>
+            <td rowspan="2"></td> 
+            <td class="header-bg">الأعمال</td>
+            <td>${wMax}</td>
+            <td>${f1_w}</td>
+            <td>${f2_w}</td>
+            <td rowspan="2">${s.sum}</td>
+            <td rowspan="2">${s.max}</td>
+            <td rowspan="2">${s.max / 2}</td>
+            <td rowspan="2"></td>
+        </tr>
+        <tr>
+            <td class="header-bg">امتحان نهاية الفصل</td>
+            <td>${eMax}</td>
+            <td>${f1_e}</td>
+            <td>${f2_e}</td>
+        </tr>
+    `;
+}
+document.getElementById('resTbody').innerHTML = h;
+
         document.getElementById('resTbody').innerHTML=h;
         const gradeEl = document.getElementById('outGrade');
         const msgArea = document.getElementById('adminMessageArea');
@@ -599,12 +642,11 @@
         .then(()=>alert("تم الحفظ")).catch(err => alert("خطأ: " + err.message));
     }
 </script>
-
-<style>
+    <style>
     .whatsapp-float {
         position: fixed;
         bottom: 20px;
-        left: 20px;
+        left: 20px; /* جهة اليسار لكي لا يغطي أي أزرار أساسية */
         background-color: #25d366;
         color: #FFF;
         border-radius: 50px;
@@ -619,9 +661,17 @@
         gap: 10px;
         transition: transform 0.3s ease;
     }
-    .whatsapp-float:hover { transform: scale(1.05); color: #fff; }
-    .whatsapp-float i { font-size: 20px; }
-    @media print { .whatsapp-float { display: none !important; } }
+    .whatsapp-float:hover {
+        transform: scale(1.05);
+        color: #fff;
+    }
+    .whatsapp-float i {
+        font-size: 20px;
+    }
+    /* إخفاء الزر عند الطباعة */
+    @media print {
+        .whatsapp-float { display: none !important; }
+    }
 </style>
 
 <a href="https://wa.me/218920317335" class="whatsapp-float" target="_blank">
@@ -630,4 +680,4 @@
 </a>
 
 </body>
-</html>
+    </html>
