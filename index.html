@@ -592,79 +592,137 @@ h += `
     }
 function autoFillSubjects() {
     const yr = document.getElementById('inYear').value;
-    const con = document.getElementById('subjectsContainer'); con.innerHTML = ""; 
-    if (schoolSubjects[yr]) schoolSubjects[yr].forEach(s => {
-        const div = document.createElement('div');
-        div.style = "background:#fff; padding:15px; border-radius:12px; margin-bottom:15px; border:2px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);";
-        div.innerHTML = `
-            <div style="font-weight:900; color:var(--primary); margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">${s}</div>
-            
-            <!-- الفصل الأول -->
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px; background:#f0f9ff; padding:8px; border-radius:8px;">
-                <div style="text-align:center;">
-                    <span style="font-size:11px; font-weight:bold;">أعمال ف1</span>
-                    <div style="display:flex; gap:2px;">
-                        <input type="number" class="f1w" placeholder="درجة">
-                        <input type="number" class="f1w_m" value="16" title="من" style="width:45px; background:#e0f2fe;">
-                    </div>
-                </div>
-                <div style="text-align:center;">
-                    <span style="font-size:11px; font-weight:bold;">امتحان ف1</span>
-                    <div style="display:flex; gap:2px;">
-                        <input type="number" class="f1e" placeholder="درجة">
-                        <input type="number" class="f1e_m" value="24" title="من" style="width:45px; background:#e0f2fe;">
-                    </div>
-                </div>
-            </div>
+    const con = document.getElementById('subjectsContainer');
+    con.innerHTML = ""; 
 
-            <!-- الفصل الثاني -->
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; background:#f0fdf4; padding:8px; border-radius:8px;">
-                <div style="text-align:center;">
-                    <span style="font-size:11px; font-weight:bold;">أعمال ف2</span>
-                    <div style="display:flex; gap:2px;">
-                        <input type="number" class="f2w" placeholder="درجة">
-                        <input type="number" class="f2w_m" value="16" title="من" style="width:45px; background:#dcfce7;">
+    if (schoolSubjects[yr]) {
+        schoolSubjects[yr].forEach(s => {
+            const div = document.createElement('div');
+            div.style = "background:#fff; padding:12px; border-radius:10px; margin-bottom:15px; border:1px solid #ccc;";
+            div.innerHTML = `
+                <div style="font-weight:900; color:#1e40af; margin-bottom:8px; border-bottom:1px solid #eee;">${s}</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div style="background:#f9fafb; padding:5px; border-radius:5px; border:1px solid #e5e7eb;">
+                        <span style="font-size:10px; font-weight:bold; display:block; text-align:center;">الفصل الأول</span>
+                        <div style="display:flex; gap:2px; margin-top:3px;">
+                            <input type="number" class="f1w" placeholder="أعمال" style="width:60%;">
+                            <input type="number" class="f1w_m" value="16" title="من" style="width:40%; background:#e2e8f0; text-align:center;">
+                        </div>
+                        <div style="display:flex; gap:2px; margin-top:3px;">
+                            <input type="number" class="f1e" placeholder="امتحان" style="width:60%;">
+                            <input type="number" class="f1e_m" value="24" title="من" style="width:40%; background:#e2e8f0; text-align:center;">
+                        </div>
+                    </div>
+                    <div style="background:#f0fdf4; padding:5px; border-radius:5px; border:1px solid #dcfce7;">
+                        <span style="font-size:10px; font-weight:bold; display:block; text-align:center;">الفصل الثاني</span>
+                        <div style="display:flex; gap:2px; margin-top:3px;">
+                            <input type="number" class="f2w" placeholder="أعمال" style="width:60%;">
+                            <input type="number" class="f2w_m" value="16" title="من" style="width:40%; background:#dcfce7; text-align:center;">
+                        </div>
+                        <div style="display:flex; gap:2px; margin-top:3px;">
+                            <input type="number" class="f2e" placeholder="امتحان" style="width:60%;">
+                            <input type="number" class="f2e_m" value="24" title="من" style="width:40%; background:#dcfce7; text-align:center;">
+                        </div>
                     </div>
                 </div>
-                <div style="text-align:center;">
-                    <span style="font-size:11px; font-weight:bold;">امتحان ف2</span>
-                    <div style="display:flex; gap:2px;">
-                        <input type="number" class="f2e" placeholder="درجة">
-                        <input type="number" class="f2e_m" value="24" title="من" style="width:45px; background:#dcfce7;">
-                    </div>
-                </div>
-            </div>
+                <div style="margin-top:8px; display:flex; justify-content:space-between; gap:10px;">
+                    <div style="flex:1;"><span style="font-size:10px;">نهاية كبرى:</span><input type="number" class="max_total" value="100" style="width:100%; font-weight:bold;"></div>
+                    <div style="flex:1;"><span style="font-size:10px;">دور ثانٍ:</span><input type="number" class="d2" placeholder="الدرجة" style="width:100%;"></div>
+                </div>`;
+            con.appendChild(div);
+        });
+    }
+}
+  function saveToFirebase() {
+    const id = document.getElementById('newStudentID').value;
+    const name = document.getElementById('inName').value;
+    const yr = document.getElementById('inYear').value;
 
-            <div style="margin-top:10px; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <input type="number" class="d2" placeholder="الدور الثاني" style="background:#fff7ed;">
-                <input type="number" class="max_total" value="100" title="النهاية الكبرى" style="font-weight:900; background:#f1f5f9;">
-            </div>`; 
-        con.appendChild(div);
+    if (!id || !name || !yr) return alert("يرجى تعبئة كافة البيانات الأساسية");
+
+    let subs = {};
+    let totalG = 0;
+    let totalM = 0;
+
+    // هنا يتم المرور على كل مادة في الواجهة وقراءة قيمها
+    document.querySelectorAll('#subjectsContainer > div').forEach(div => {
+        // نأخذ اسم المادة من العنوان
+        const n = div.querySelector('div').innerText.replace('مادة: ', '').trim();
+
+        // قراءة الدرجات والـ "من" لكل خانة (الأسطر التي سألت عنها هنا مكانها)
+        const f1w = parseFloat(div.querySelector('.f1w').value) || 0;
+        const f1w_m = parseFloat(div.querySelector('.f1w_m').value) || 0; // أعمال ف1 من
+        
+        const f1e = parseFloat(div.querySelector('.f1e').value) || 0;
+        const f1e_m = parseFloat(div.querySelector('.f1e_m').value) || 0; // امتحان ف1 من
+        
+        const f2w = parseFloat(div.querySelector('.f2w').value) || 0;
+        const f2w_m = parseFloat(div.querySelector('.f2w_m').value) || 0; // أعمال ف2 من
+        
+        const f2e = parseFloat(div.querySelector('.f2e').value) || 0;
+        const f2e_m = parseFloat(div.querySelector('.f2e_m').value) || 0; // امتحان ف2 من
+        
+        const max = parseFloat(div.querySelector('.max_total').value) || 100;
+        const d2 = parseFloat(div.querySelector('.d2').value) || 0;
+
+        // حساب مجموع درجات المادة (أعمال 1+2 وامتحان 1+2)
+        const subSum = f1w + f1e + f2w + f2e;
+
+        // تخزين البيانات في كائن المادة
+        subs[n] = {
+            f1w, f1w_m,
+            f1e, f1e_m,
+            f2w, f2w_m,
+            f2e, f2e_m,
+            max, d2, sum: subSum
+        };
+
+        totalG += subSum;
+        totalM += max;
+    });
+
+    // إرسال الكائن الكامل إلى Firebase
+    db.ref('students/' + id).set({
+        name: name,
+        year: yr,
+        subjects: subs,
+        totalGot: totalG,
+        totalMax: totalM,
+        percent: ((totalG / totalM) * 100).toFixed(1)
+    }).then(() => {
+        alert("تم حفظ بيانات الطالب بنجاح ✅");
+        location.reload();
     });
 }
 
-  function saveToFirebase() {
-    const id = document.getElementById('newStudentID').value; 
-    const name = document.getElementById('inName').value; 
-    const yr = document.getElementById('inYear').value;
-    if(!id || !name || !yr) return alert("أكمل البيانات");
-    
-    let subs = {}; let tG=0; let tM=0;
-    document.querySelectorAll('#subjectsContainer > div').forEach(div => {
-        const n = div.querySelector('div').innerText; 
-        
-        const data = {
-            f1w: parseFloat(div.querySelector('.f1w').value) || 0,
-            f1w_m: parseFloat(div.querySelector('.f1w_m').value) || 16,
-            f1e: parseFloat(div.querySelector('.f1e').value) || 0,
-            f1e_m: parseFloat(div.querySelector('.f1e_m').value) || 24,
-            f2w: parseFloat(div.querySelector('.f2w').value) || 0,
-            f2w_m: parseFloat(div.querySelector('.f2w_m').value) || 16,
-            f2e: parseFloat(div.querySelector('.f2e').value) || 0,
-            f2e_m: parseFloat(div.querySelector('.f2e_m').value) || 24,
-            d2: parseFloat(div.querySelector('.d2').value) || 0,
-            max: parseFloat(div.querySelector('.max_total').value) || 100
-        };
+        async function saveBulkData() {
+    const sub = document.getElementById('bulkSubject').value;
+    const m_f1w = parseFloat(document.getElementById('m_f1w').value) || 0;
+    const m_f1e = parseFloat(document.getElementById('m_f1e').value) || 0;
+    const m_f2w = parseFloat(document.getElementById('m_f2w').value) || 0;
+    const m_f2e = parseFloat(document.getElementById('m_f2e').value) || 0;
+    const m_total = parseFloat(document.getElementById('m_total').value) || 100;
+
+    const rows = document.querySelectorAll('#bBody tr');
+    for (let tr of rows) {
+        const id = tr.getAttribute('data-id');
+        const f1w = parseFloat(tr.querySelector('.bf1w').value) || 0;
+        const f1e = parseFloat(tr.querySelector('.bf1e').value) || 0;
+        const f2w = parseFloat(tr.querySelector('.bf2w').value) || 0;
+        const f2e = parseFloat(tr.querySelector('.bf2e').value) || 0;
+
+        await db.ref(`students/${id}/subjects/${sub}`).update({
+            f1w, f1w_m: m_f1w,
+            f1e, f1e_m: m_f1e,
+            f2w, f2w_m: m_f2w,
+            f2e, f2e_m: m_f2e,
+            max: m_total,
+            sum: (f1w + f1e + f2w + f2e)
+        });
+    }
+    alert("تم حفظ درجات المادة لجميع الطلاب بنجاح! ✅");
+}
+
 
         const subTotal = data.f1w + data.f1e + data.f2w + data.f2e;
         data.sum = subTotal;
