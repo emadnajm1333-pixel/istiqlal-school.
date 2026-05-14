@@ -621,50 +621,6 @@ function autoFillSubjects() {
             con.appendChild(div);
         });
     }
-}
-
-// 2. دالة الحفظ (تجميع البيانات وإرسالها)
-function saveToFirebase() {
-    var id = document.getElementById('newStudentID').value;
-    var name = document.getElementById('inName').value;
-    var yr = document.getElementById('inYear').value;
-
-    if (!id || !name || !yr) { alert("أكمل البيانات"); return; }
-
-    var subs = {};
-    var tG = 0; var tM = 0;
-
-    var items = document.querySelectorAll('#subjectsContainer > div');
-    items.forEach(function(div) {
-        var n = div.querySelector('div').innerText.replace('مادة: ', '').trim();
-        var data = {
-            f1w: parseFloat(div.querySelector('.f1w').value) || 0,
-            f1w_m: parseFloat(div.querySelector('.f1w_m').value) || 0,
-            f1e: parseFloat(div.querySelector('.f1e').value) || 0,
-            f1e_m: parseFloat(div.querySelector('.f1e_m').value) || 0,
-            f2w: parseFloat(div.querySelector('.f2w').value) || 0,
-            f2w_m: parseFloat(div.querySelector('.f2w_m').value) || 0,
-            f2e: parseFloat(div.querySelector('.f2e').value) || 0,
-            f2e_m: parseFloat(div.querySelector('.f2e_m').value) || 0,
-            max: parseFloat(div.querySelector('.max_total').value) || 100,
-            d2: parseFloat(div.querySelector('.d2').value) || 0
-        };
-        data.sum = data.f1w + data.f1e + data.f2w + data.f2e;
-        subs[n] = data;
-        tG += data.sum;
-        tM += data.max;
-    });
-
-    db.ref('students/' + id).set({
-        name: name, year: yr, subjects: subs,
-        totalGot: tG, totalMax: tM,
-        percent: ((tG / tM) * 100).toFixed(1)
-    }).then(function() {
-        alert("تم الحفظ ✅");
-        location.reload();
-    });
-}
-
   function saveToFirebase() {
     const id = document.getElementById('newStudentID').value;
     const name = document.getElementById('inName').value;
