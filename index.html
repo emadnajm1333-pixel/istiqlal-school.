@@ -27,7 +27,9 @@
 
         * { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
         body { margin: 0; background: var(--bg); color: var(--text); padding: 5px; min-height: 100vh; overflow-x: hidden; }
-        .container { max-width: 1000px; margin: 2px auto; position: relative; }
+        
+        /* التعديل: تكبير عرض الحاوية الأساسية */
+        .container { max-width: 1250px; margin: 2px auto; position: relative; }
         
         #loadingOverlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -43,8 +45,9 @@
         .container::before { right: -12px; }
         .container::after { left: -12px; }
 
+        /* التعديل: زيادة مساحة الكرت */
         .main-card { 
-            background: var(--card); border-radius: 20px; padding: 12px; 
+            background: var(--card); border-radius: 20px; padding: 25px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border);
             position: relative; z-index: 1; width: 100%;
         }
@@ -75,16 +78,24 @@
         #resultView { display: none; margin-top: 5px; padding: 15px; border-radius: 12px; background: #fff; }
         
         .res-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); margin-bottom: 5px; }
+        
+        /* التعديل: تكبير خط عناوين الجدول */
         .res-table th { 
-            background: var(--primary); color: white; padding: 4px 1px; font-size: 9px; border: 1px solid #fff;
-            line-height: 1.1; word-wrap: break-word; vertical-align: middle;
+            background: var(--primary); color: white; padding: 8px 2px; font-size: 13px; border: 1px solid #fff;
+            line-height: 1.2; word-wrap: break-word; vertical-align: middle;
         }
-        .res-table td { padding: 10px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; color: #000; font-size: 11px; overflow: hidden; }
+        
+        /* التعديل: تكبير خط الأرقام والدرجات ليكون واضحاً لولي الأمر */
+        .res-table td { padding: 12px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; color: #000; font-size: 16px; overflow: hidden; }
 
-        .summary-box { margin-top: 0; border: 2px solid var(--primary); background: #f8fafc; border-radius: 0 0 10px 10px; }
-        .status-pass-text { color: var(--success) !important; font-weight: 900; }
-        .status-fail-text { color: var(--danger) !important; font-weight: 900; }
-        .grade-success-color { color: var(--success) !important; font-weight: 900; }
+        .summary-box { margin-top: 0; border: 3px solid var(--primary); background: #f8fafc; border-radius: 0 0 10px 10px; }
+        
+        /* التعديل: تكبير خط المجموع والنسبة */
+        .summary-box div { font-size: 17px !important; padding: 10px 12px !important; }
+
+        .status-pass-text { color: var(--success) !important; font-weight: 900; font-size: 18px; }
+        .status-fail-text { color: var(--danger) !important; font-weight: 900; font-size: 18px; }
+        .grade-success-color { color: var(--success) !important; font-weight: 900; font-size: 18px; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
         .stat-box { padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
@@ -96,10 +107,10 @@
 
         .bulk-row { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); position: relative; }
 
-        /* --- تحسينات خانات الرصد الفردي والجماعي الجديدة --- */
+        /* التعديل: توسيع شبكة الرصد لإعطاء مساحة لاسم المادة */
         .bulk-grid, .ind-grid { 
             display: grid; 
-            grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; /* توسيع خانة المادة */
+            grid-template-columns: 2.8fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
             gap: 4px; 
             margin-bottom: 5px; 
             align-items: center;
@@ -107,32 +118,29 @@
 
         .bulk-header-labels, #individualHeaderLabels {
             display: grid; 
-            grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+            grid-template-columns: 2.8fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
             gap: 4px; 
-            font-size: 10px; 
+            font-size: 11px; 
             font-weight: bold; 
             text-align: center; 
             color: var(--primary);
             padding: 5px 0;
         }
 
-        /* تحسين شكل المدخلات داخل الرصد */
         .bulk-grid input, .ind-grid input {
-            padding: 6px 2px;
+            padding: 8px 2px;
             margin-bottom: 0;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
         }
 
-        /* تمييز خانات الدرجات باللون الأبيض */
         .bulk-grid input[type="number"]:nth-child(even), 
         .ind-grid input[type="number"]:nth-child(even) {
             background: #ffffff;
             border-color: #94a3b8;
         }
 
-        /* تمييز خانات (من) بلون رمادي خفيف */
         .bulk-grid input[type="number"]:nth-child(odd), 
         .ind-grid input[type="number"]:nth-child(odd) {
             background: #f1f5f9;
@@ -140,13 +148,12 @@
             border-color: #e2e8f0;
         }
 
-        /* تحسين مظهر اسم المادة */
         .sub-name-input {
             background: #f0fdf4 !important;
             color: var(--success) !important;
             text-align: right !important;
             padding-right: 8px !important;
-            font-size: 11px !important;
+            font-size: 13px !important;
             border: 1px solid #bbf7d0 !important;
             white-space: nowrap;
             overflow: visible;
@@ -191,9 +198,9 @@
                 <i class="fas fa-arrow-right"></i> العودة للإحصائيات
             </button>
 
-            <div style="text-align: center; margin-bottom: 5px; border-bottom: 2px solid #eee; padding-bottom: 5px;">
-                <h2 id="outName" style="margin: 0; font-size: 17px; color: var(--text);"></h2>
-                <div id="outYear" style="color: var(--accent); font-weight: 800; font-size: 13px; margin-top: 1px;"></div>
+            <div style="text-align: center; margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+                <h2 id="outName" style="margin: 0; font-size: 20px; color: var(--text);"></h2>
+                <div id="outYear" style="color: var(--accent); font-weight: 800; font-size: 15px; margin-top: 1px;"></div>
             </div>
             
             <table class="res-table">
@@ -209,7 +216,7 @@
                         <th colspan="2">درجة التلميذ</th>
                         <th colspan="2">النهايات</th>
                         <th rowspan="2">مجموع الفصلين</th>
-                        <th rowspan="2" style="padding: 1px; font-size: 9px; min-width: 30px; line-height: 1.1;">امتحان<br>الدور<br>الثاني<br>40%</th>
+                        <th rowspan="2" style="padding: 1px; font-size: 10px; min-width: 30px; line-height: 1.1;">امتحان<br>الدور<br>الثاني<br>40%</th>
                         <th rowspan="2">نتيجة الدور الثاني</th>
                     </tr>
                     <tr>
@@ -223,19 +230,19 @@
             </table>
 
             <div class="summary-box">
-                <div id="totalRow" style="display:flex; justify-content:space-between; padding:5px 12px; border-bottom:1px solid #e2e8f0; font-size:13px;">
+                <div id="totalRow" style="display:flex; justify-content:space-between; padding:5px 12px; border-bottom:1px solid #e2e8f0;">
                     <span>المجموع الكلي:</span><span id="outTotalSum" style="font-weight:900; color:var(--primary);"></span>
                 </div>
-                <div id="percentRow" style="display:flex; justify-content:space-between; padding:5px 12px; border-bottom:1px solid #e2e8f0; font-size:13px;">
+                <div id="percentRow" style="display:flex; justify-content:space-between; padding:5px 12px; border-bottom:1px solid #e2e8f0;">
                     <span>النسبة المئوية:</span><span id="outPercent" style="font-weight:900; color:var(--primary);"></span>
                 </div>
-                <div style="display:flex; justify-content:space-between; padding:5px 12px; font-size:13px;">
+                <div style="display:flex; justify-content:space-between; padding:5px 12px;">
                     <span>التقدير العام:</span><span id="outGrade" style="font-weight:900;"></span>
                 </div>
-                <div id="adminMessageArea" style="text-align:center; padding:10px; font-weight:700; color:var(--primary); font-size:14px; font-style:italic; border-top:1px solid #eee;"></div>
+                <div id="adminMessageArea" style="text-align:center; padding:15px; font-weight:700; color:var(--primary); font-size:18px; font-style:italic; border-top:1px solid #eee;"></div>
             </div>
             
-            <div id="failMissions" style="display:none; background:#fee2e2; border:2px solid var(--danger); color:#991b1b; padding:8px; border-radius:10px; margin-top:8px; text-align:center; font-weight:900; font-size:12px;">
+            <div id="failMissions" style="display:none; background:#fee2e2; border:2px solid var(--danger); color:#991b1b; padding:12px; border-radius:10px; margin-top:8px; text-align:center; font-weight:900; font-size:14px;">
                 <div style="margin-bottom:2px; text-decoration:underline;">المواد التي لم توفق فيها ولها دور ثانٍ:</div>
                 <div id="failListItems"></div>
             </div>
@@ -704,24 +711,24 @@
 <style>
     .whatsapp-float {
         position: fixed;
-        bottom: 15px;
-        left: 15px;
+        bottom: 20px;
+        left: 20px;
         background-color: #25d366;
         color: #FFF;
-        border-radius: 40px;
-        padding: 7px 15px;
+        border-radius: 50px;
+        padding: 10px 20px;
         font-weight: 700;
-        font-size: 9px;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         z-index: 9999;
         text-decoration: none;
         display: flex;
         align-items: center;
-        gap: 7px;
+        gap: 10px;
         transition: transform 0.3s ease;
     }
     .whatsapp-float:hover { transform: scale(1.05); color: #fff; }
-    .whatsapp-float i { font-size: 15px; }
+    .whatsapp-float i { font-size: 20px; }
     @media print { .whatsapp-float { display: none !important; } }
 </style>
 
