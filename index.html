@@ -96,10 +96,9 @@
 
         .bulk-row { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); position: relative; }
 
-        /* --- تحسينات خانات الرصد الفردي والجماعي الجديدة --- */
         .bulk-grid, .ind-grid { 
             display: grid; 
-            grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; /* توسيع خانة المادة */
+            grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; 
             gap: 4px; 
             margin-bottom: 5px; 
             align-items: center;
@@ -116,7 +115,6 @@
             padding: 5px 0;
         }
 
-        /* تحسين شكل المدخلات داخل الرصد */
         .bulk-grid input, .ind-grid input {
             padding: 6px 2px;
             margin-bottom: 0;
@@ -125,14 +123,12 @@
             font-weight: 700;
         }
 
-        /* تمييز خانات الدرجات باللون الأبيض */
         .bulk-grid input[type="number"]:nth-child(even), 
         .ind-grid input[type="number"]:nth-child(even) {
             background: #ffffff;
             border-color: #94a3b8;
         }
 
-        /* تمييز خانات (من) بلون رمادي خفيف */
         .bulk-grid input[type="number"]:nth-child(odd), 
         .ind-grid input[type="number"]:nth-child(odd) {
             background: #f1f5f9;
@@ -140,7 +136,6 @@
             border-color: #e2e8f0;
         }
 
-        /* تحسين مظهر اسم المادة */
         .sub-name-input {
             background: #f0fdf4 !important;
             color: var(--success) !important;
@@ -390,6 +385,8 @@
                     document.getElementById('loadingOverlay').style.display='none';
                     document.getElementById('searchSection').style.display='none';
                     document.getElementById('adminPortal').style.display='block';
+                    // إضافة السطر المطلوب لإخفاء الواتساب عند الدخول للبوابة
+                    document.getElementById('whatsappBtn').style.display = 'none';
                 })
                 .catch(err => {
                     document.getElementById('loadingOverlay').style.display='none';
@@ -725,7 +722,7 @@
     @media print { .whatsapp-float { display: none !important; } }
 </style>
 
-<a href="https://wa.me/218920317335" class="whatsapp-float" target="_blank">
+<a href="https://wa.me/218920317335" class="whatsapp-float" id="whatsappBtn" target="_blank">
     <i class="fab fa-whatsapp"></i>
     <span>للاستفسار والتواصل</span>
 </a>
