@@ -72,14 +72,14 @@
         .btn { width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; }
         .btn-primary { background: var(--primary); color: white; }
         
-        #resultView { display: none; margin-top: 5px; padding: 15px; border-radius: 12px; background: #fff; }
+        #resultView { display: none; margin-top: 5px; padding: 15px; border-radius: 12px; background: #fff; width: 100%; overflow: hidden; }
         
-        .res-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); margin-bottom: 5px; }
+        .res-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); margin-bottom: 5px; table-layout: fixed; }
         .res-table th { 
             background: var(--primary); color: white; padding: 4px 1px; font-size: 9px; border: 1px solid #fff;
             line-height: 1.1; word-wrap: break-word; vertical-align: middle;
         }
-        .res-table td { padding: 10px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; color: #000; font-size: 11px; overflow: hidden; }
+        .res-table td { padding: 8px 2px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; color: #000; font-size: 10px; overflow: hidden; word-wrap: break-word; }
 
         .summary-box { margin-top: 0; border: 2px solid var(--primary); background: #f8fafc; border-radius: 0 0 10px 10px; }
         .status-pass-text { color: var(--success) !important; font-weight: 900; }
@@ -194,7 +194,7 @@
             <table class="res-table">
                 <thead>
                     <tr>
-                        <th rowspan="3" style="width: 20%;">المادة</th>
+                        <th rowspan="3" style="width: 18%;">المادة</th>
                         <th colspan="4">درجة الفصلين</th>
                         <th colspan="6">النتيجة النهائية للتلميذ</th>
                     </tr>
@@ -349,7 +349,6 @@
     const db = firebase.database();
     const auth = firebase.auth();
 
-    // تحديث مصفوفة المواد والدرجات حسب طلبك (واتية للرصد)
     const schoolSubjects = {
         "سابع": {
             "التربية الإسلامية": {w: 16, e: 24}, "اللغة العربية": {w: 32, e: 48}, "الكتابة": {w: 16, e: 24},
@@ -429,7 +428,7 @@
                 let totalMax = 0;
                 Object.keys(schoolSubjects[yr]).forEach(s => { 
                     const info = schoolSubjects[yr][s];
-                    const m = (info.w + info.e) * 2; // مجموع الفصلين
+                    const m = (info.w + info.e) * 2; 
                     subs[s] = {wG1:0, wM1:info.w, eG1:0, eM1:info.e, wG2:0, wM2:info.w, eG2:0, eM2:info.e, sum:0, max:m}; 
                     totalMax += m;
                 });
@@ -452,8 +451,10 @@
         if(!id) return alert("أدخل الرقم الوطني");
         document.getElementById('loadingOverlay').style.display='flex';
         db.ref('students/'+id).once('value', snap => {
-            document.getElementById('loadingOverlay').style.none;
-            if(!snap.exists()) return alert("غير موجودة");
+            if(!snap.exists()) {
+                document.getElementById('loadingOverlay').style.display='none';
+                return alert("غير موجودة");
+            }
             const data = snap.val();
             document.getElementById('newStudentID').value = id; 
             document.getElementById('inName').value = data.name;
@@ -531,10 +532,8 @@
                 const wm2 = info.w;
                 const eg2 = parseFloat(grid.querySelector('.eG2').value) || 0;
                 const em2 = info.e;
-
                 const currentSum = (wg1 + eg1 + wg2 + eg2);
                 const currentMax = (wm1 + em1 + wm2 + em2);
-
                 subs[subName] = {wG1:wg1, wM1:wm1, eG1:eg1, eM1:em1, wG2:wg2, wM2:wm2, eG2:eg2, eM2:em2, sum:currentSum, max:currentMax};
                 tG += currentSum; 
                 tM += currentMax;
@@ -605,7 +604,9 @@
         document.getElementById('outName').innerText = data.name;
         document.getElementById('outYear').innerText = "الصف: " + data.year;
         let h=""; let failed=[]; let hasFail=false;
-        const sortedKeys = Object.keys(schoolSubjects[data.year]) || Object.keys(data.subjects);
+        
+        // استخدام المفاتيح المرتبة لضمان ثبات الترتيب
+        const sortedKeys = schoolSubjects[data.year] ? Object.keys(schoolSubjects[data.year]) : Object.keys(data.subjects);
         
         sortedKeys.forEach(k => {
             if(data.subjects[k]) {
@@ -617,7 +618,7 @@
                 <tr>
                     <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${k}</td>
                     <td style="border:1px solid #cbd5e1; padding:2px;">الأعمال</td>
-                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.wM1}</td>
+                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.wM1 || '-'}</td>
                     <td style="border:1px solid #cbd5e1; padding:2px;">${s.wG1 ?? '0'}</td>
                     <td style="border:1px solid #cbd5e1; padding:2px;">${s.wG2 ?? '0'}</td>
                     <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${s.max ?? '100'}</td>
@@ -628,7 +629,7 @@
                 </tr>
                 <tr>
                     <td style="border:1px solid #cbd5e1; padding:2px;">امتحان الفصل</td>
-                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.eM1}</td>
+                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.eM1 || '-'}</td>
                     <td style="border:1px solid #cbd5e1; padding:2px;">${s.eG1 ?? '0'}</td>
                     <td style="border:1px solid #cbd5e1; padding:2px;">${s.eG2 ?? '0'}</td>
                 </tr>`;
@@ -704,10 +705,8 @@
             const wm2 = info.w;
             const eg2 = parseFloat(div.querySelector('.eG2').value) || 0;
             const em2 = info.e;
-
             const currentSum = (wg1 + eg1 + wg2 + eg2);
             const currentMax = (wm1 + em1 + wm2 + em2);
-
             subs[n] = {wG1:wg1, wM1:wm1, eG1:eg1, eM1:em1, wG2:wg2, wM2:wm2, eG2:eg2, eM2:em2, sum:currentSum, max:currentMax}; 
             tG += currentSum; 
             tM += currentMax;
