@@ -148,7 +148,7 @@
         }
 
         @media print {
-            .btn, .search-container, #adminPortal, .admin-tabs, .dev-footer-simple, .container::before, .container::after, #backToStatsBtn, .school-header, .whatsapp-float { display: none !important; }
+            .btn, .search-container, #adminPortal, .admin-tabs, .dev-footer-simple, .container::before, .container::after, #backToStatsBtn, .school-header { display: none !important; }
             #resultView { display: block !important; width: 100%; border: none; padding: 0; }
         }
     </style>
@@ -269,11 +269,8 @@
         <div id="individualTab" class="admin-section active">
             <div style="background:#f1f5f9; padding:15px; border-radius:12px; margin-bottom:15px; border:1px dashed var(--primary);">
                 <label style="font-weight:900; display:block; margin-bottom:5px;">البحث عن طالبة للتعديل:</label>
-                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                    <input type="number" id="editID" placeholder="الرقم الوطني للتعديل..." style="margin-bottom:0;">
-                    <button onclick="fetchForEdit()" class="btn" style="background:var(--primary); color:white; flex:1; padding:5px;">جلب البيانات</button>
-                </div>
-                <button id="deleteBtn" onclick="deleteStudent()" class="btn" style="background:var(--danger); color:white; display:none;"><i class="fas fa-trash"></i> حذف الطالبة نهائياً من المنظومة</button>
+                <input type="number" id="editID" placeholder="الرقم الوطني للتعديل...">
+                <button onclick="fetchForEdit()" class="btn" style="background:var(--primary); color:white;">جلب البيانات</button>
             </div>
             <hr style="margin:20px 0; opacity:0.2;">
             <input type="number" id="newStudentID" placeholder="الرقم الوطني للطالبة الجديدة...">
@@ -296,7 +293,6 @@
                 <option value="خامس">خامس</option><option value="سادس">سادس</option>
                 <option value="سابع">سابع</option><option value="ثامن">ثامن</option>
             </select>
-            <input type="text" id="bulkSearchInput" placeholder="🔍 بحث بالاسم للتسهيل..." style="margin-bottom:10px; border-color:var(--primary);" onkeyup="filterBulkList()">
             <div id="bulkStudentsContainer"></div>
             <button id="saveAllBulkBtn" class="btn" style="display:none; background:var(--success); color:white; margin-top:15px;" onclick="saveAllBulkData()">حفظ الكل</button>
         </div>
@@ -353,6 +349,7 @@
     const db = firebase.database();
     const auth = firebase.auth();
 
+    // تحديث مصفوفة المواد والدرجات حسب طلبك (واتية للرصد)
     const schoolSubjects = {
         "سابع": {
             "التربية الإسلامية": {w: 16, e: 24}, "اللغة العربية": {w: 32, e: 48}, "الكتابة": {w: 16, e: 24},
@@ -405,7 +402,7 @@
                     document.getElementById('loadingOverlay').style.display='none';
                     document.getElementById('searchSection').style.display='none';
                     document.getElementById('adminPortal').style.display='block';
-                    document.getElementById('whatsappBtn').style.display='none'; // إخفاء زر الواتس
+                    document.getElementById('whatsappBtn').style.display = 'none';
                 })
                 .catch(err => {
                     document.getElementById('loadingOverlay').style.display='none';
@@ -418,34 +415,6 @@
         });
     }
 
-    function filterBulkList() {
-        const query = document.getElementById('bulkSearchInput').value.toLowerCase();
-        const rows = document.querySelectorAll('.bulk-row');
-        rows.forEach(row => {
-            const name = row.querySelector('div').innerText.toLowerCase();
-            if(name.includes(query)) row.style.display = "block";
-            else row.style.display = "none";
-        });
-    }
-
-    function deleteStudent() {
-        const id = document.getElementById('newStudentID').value;
-        const name = document.getElementById('inName').value;
-        if(!id) return;
-        if(confirm(`هل أنت متأكد تماماً من حذف الطالبة (${name}) نهائياً؟`)) {
-            document.getElementById('loadingOverlay').style.display='flex';
-            db.ref('students/'+id).remove().then(() => {
-                document.getElementById('loadingOverlay').style.display='none';
-                alert("تم حذف الطالبة بنجاح.");
-                // إعادة تصفير واجهة الفردي بدلاً من الريفريش
-                document.getElementById('newStudentID').value = "";
-                document.getElementById('inName').value = "";
-                document.getElementById('subjectsContainer').innerHTML = "";
-                document.getElementById('deleteBtn').style.display = 'none';
-            });
-        }
-    }
-
     function processQuickAdd() {
         const yr = document.getElementById('quickAddYear').value;
         const text = document.getElementById('quickAddArea').value;
@@ -456,10 +425,11 @@
             const parts = line.split(/[-،,]/);
             if(parts.length >= 2) {
                 const name = parts[0].trim(); const id = parts[1].trim();
-                let subs = {}; let totalMax = 0;
+                let subs = {};
+                let totalMax = 0;
                 Object.keys(schoolSubjects[yr]).forEach(s => { 
                     const info = schoolSubjects[yr][s];
-                    const m = (info.w + info.e) * 2;
+                    const m = (info.w + info.e) * 2; // مجموع الفصلين
                     subs[s] = {wG1:0, wM1:info.w, eG1:0, eM1:info.e, wG2:0, wM2:info.w, eG2:0, eM2:info.e, sum:0, max:m}; 
                     totalMax += m;
                 });
@@ -471,7 +441,7 @@
             document.getElementById('loadingOverlay').style.display='flex';
             db.ref().update(updates).then(() => {
                 document.getElementById('loadingOverlay').style.display='none';
-                alert(`تم تسجيل ${count} طالبة بنجاح.`);
+                alert(`تم تسجيل ${count} طالبة بنجاح وعمل تهيئة للفصلين.`);
                 document.getElementById('quickAddArea').value = "";
             });
         }
@@ -482,30 +452,29 @@
         if(!id) return alert("أدخل الرقم الوطني");
         document.getElementById('loadingOverlay').style.display='flex';
         db.ref('students/'+id).once('value', snap => {
-            document.getElementById('loadingOverlay').style.display='none';
+            document.getElementById('loadingOverlay').style.none;
             if(!snap.exists()) return alert("غير موجودة");
             const data = snap.val();
             document.getElementById('newStudentID').value = id; 
             document.getElementById('inName').value = data.name;
             document.getElementById('inYear').value = data.year;
-            document.getElementById('deleteBtn').style.display = 'flex';
             const con = document.getElementById('subjectsContainer');
             con.innerHTML = "";
             Object.keys(schoolSubjects[data.year]).forEach(s => {
                 const info = schoolSubjects[data.year][s];
-                const subData = data.subjects[s] || {};
+                const subData = data.subjects[s] || {wG1:0, wM1:info.w, eG1:0, eM1:info.e, wG2:0, wM2:info.w, eG2:0, eM2:info.e};
                 const div = document.createElement('div');
                 div.className = "ind-grid";
-                // نضع القيمة فارغة إذا كانت صفراً لتسهيل الرصد
                 div.innerHTML = `
                     <input type="text" value="${s}" readonly class="sub-name-input">
-                    <input type="number" class="wG1" value="${subData.wG1 || ''}"> <input type="number" class="wM1" value="${info.w}" readonly style="background:#eee">
-                    <input type="number" class="eG1" value="${subData.eG1 || ''}"> <input type="number" class="eM1" value="${info.e}" readonly style="background:#eee">
-                    <input type="number" class="wG2" value="${subData.wG2 || ''}"> <input type="number" class="wM2" value="${info.w}" readonly style="background:#eee">
-                    <input type="number" class="eG2" value="${subData.eG2 || ''}"> <input type="number" class="eM2" value="${info.e}" readonly style="background:#eee">
+                    <input type="number" class="wG1" value="${subData.wG1 || 0}"> <input type="number" class="wM1" value="${subData.wM1 || info.w}" readonly style="background:#eee">
+                    <input type="number" class="eG1" value="${subData.eG1 || 0}"> <input type="number" class="eM1" value="${subData.eM1 || info.e}" readonly style="background:#eee">
+                    <input type="number" class="wG2" value="${subData.wG2 || 0}"> <input type="number" class="wM2" value="${subData.wM2 || info.w}" readonly style="background:#eee">
+                    <input type="number" class="eG2" value="${subData.eG2 || 0}"> <input type="number" class="eM2" value="${subData.eM2 || info.e}" readonly style="background:#eee">
                 `; 
                 con.appendChild(div);
             });
+            document.getElementById('loadingOverlay').style.display='none';
         });
     }
 
@@ -527,13 +496,13 @@
                     <div class="bulk-header-labels"><span>المادة</span><span>أعمال1</span><span>من</span><span>امتحان1</span><span>من</span><span>أعمال2</span><span>من</span><span>امتحان2</span><span>من</span></div>`;
                 Object.keys(schoolSubjects[yr]).forEach(subName => {
                     const info = schoolSubjects[yr][subName];
-                    const subData = (s.subjects && s.subjects[subName]) ? s.subjects[subName] : {};
+                    const subData = (s.subjects && s.subjects[subName]) ? s.subjects[subName] : {wG1:0, wM1:info.w, eG1:0, eM1:info.e, wG2:0, wM2:info.w, eG2:0, eM2:info.e};
                     html += `<div class="bulk-grid" data-subject="${subName}">
                         <input type="text" value="${subName}" readonly class="sub-name-input">
-                        <input type="number" class="wG1" value="${subData.wG1 || ''}"> <input type="number" class="wM1" value="${info.w}" readonly>
-                        <input type="number" class="eG1" value="${subData.eG1 || ''}"> <input type="number" class="eM1" value="${info.e}" readonly>
-                        <input type="number" class="wG2" value="${subData.wG2 || ''}"> <input type="number" class="wM2" value="${info.w}" readonly>
-                        <input type="number" class="eG2" value="${subData.eG2 || ''}"> <input type="number" class="eM2" value="${info.e}" readonly>
+                        <input type="number" class="wG1" value="${subData.wG1 || 0}"> <input type="number" class="wM1" value="${subData.wM1 || info.w}" readonly>
+                        <input type="number" class="eG1" value="${subData.eG1 || 0}"> <input type="number" class="eM1" value="${subData.eM1 || info.e}" readonly>
+                        <input type="number" class="wG2" value="${subData.wG2 || 0}"> <input type="number" class="wM2" value="${subData.wM2 || info.w}" readonly>
+                        <input type="number" class="eG2" value="${subData.eG2 || 0}"> <input type="number" class="eM2" value="${subData.eM2 || info.e}" readonly>
                     </div>`;
                 });
                 html += `</div>`;
@@ -545,7 +514,8 @@
 
     function saveAllBulkData() {
         const rows = document.querySelectorAll('.bulk-row');
-        let updates = {}; const yr = document.getElementById('bulkSelectYear').value;
+        let updates = {};
+        const yr = document.getElementById('bulkSelectYear').value;
         rows.forEach(row => {
             const id = row.getAttribute('data-id');
             const name = row.querySelector('div').innerText.split(' (')[0];
@@ -554,17 +524,24 @@
                 const subName = grid.getAttribute('data-subject');
                 const info = schoolSubjects[yr][subName];
                 const wg1 = parseFloat(grid.querySelector('.wG1').value) || 0;
+                const wm1 = info.w;
                 const eg1 = parseFloat(grid.querySelector('.eG1').value) || 0;
+                const em1 = info.e;
                 const wg2 = parseFloat(grid.querySelector('.wG2').value) || 0;
+                const wm2 = info.w;
                 const eg2 = parseFloat(grid.querySelector('.eG2').value) || 0;
+                const em2 = info.e;
+
                 const currentSum = (wg1 + eg1 + wg2 + eg2);
-                const currentMax = (info.w + info.e) * 2;
-                subs[subName] = {wG1:wg1, wM1:info.w, eG1:eg1, eM1:info.e, wG2:wg2, wM2:info.w, eG2:eg2, eM2:info.e, sum:currentSum, max:currentMax};
-                tG += currentSum; tM += currentMax;
+                const currentMax = (wm1 + em1 + wm2 + em2);
+
+                subs[subName] = {wG1:wg1, wM1:wm1, eG1:eg1, eM1:em1, wG2:wg2, wM2:wm2, eG2:eg2, eM2:em2, sum:currentSum, max:currentMax};
+                tG += currentSum; 
+                tM += currentMax;
             });
             updates['students/'+id] = {name, year:yr, subjects:subs, totalGot:tG, totalMax:tM, percent:((tG/tM)*100).toFixed(1)};
         });
-        db.ref().update(updates).then(() => alert("تم حفظ كل الدرجات بنجاح."));
+        db.ref().update(updates).then(() => alert("تم الحفظ بنجاح لجميع الطالبات"));
     }
 
     function loadClassStats() {
@@ -629,18 +606,40 @@
         document.getElementById('outYear').innerText = "الصف: " + data.year;
         let h=""; let failed=[]; let hasFail=false;
         const sortedKeys = Object.keys(schoolSubjects[data.year]) || Object.keys(data.subjects);
+        
         sortedKeys.forEach(k => {
             if(data.subjects[k]) {
                 const s = data.subjects[k]; 
                 const isFail = s.sum < (s.max/2);
                 if(isFail) { hasFail=true; failed.push(k); }
-                h += `<tr><td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${k}</td><td style="border:1px solid #cbd5e1; padding:2px;">الأعمال</td><td style="border:1px solid #cbd5e1; padding:2px;">${s.wM1}</td><td style="border:1px solid #cbd5e1; padding:2px;">${s.wG1 ?? '0'}</td><td style="border:1px solid #cbd5e1; padding:2px;">${s.wG2 ?? '0'}</td><td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${s.max ?? '100'}</td><td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${(s.max/2) ?? '50'}</td><td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px; color:${isFail?'red':'black'}">${s.sum ?? '0'}</td><td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:1px; min-width:30px; color:red;">${isFail ? (s.secondExam || '-') : '-'}</td><td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px; min-width:30px">-</td></tr><tr><td style="border:1px solid #cbd5e1; padding:2px;">امتحان الفصل</td><td style="border:1px solid #cbd5e1; padding:2px;">${s.eM1}</td><td style="border:1px solid #cbd5e1; padding:2px;">${s.eG1 ?? '0'}</td><td style="border:1px solid #cbd5e1; padding:2px;">${s.eG2 ?? '0'}</td></tr>`;
+                
+                h += `
+                <tr>
+                    <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${k}</td>
+                    <td style="border:1px solid #cbd5e1; padding:2px;">الأعمال</td>
+                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.wM1}</td>
+                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.wG1 ?? '0'}</td>
+                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.wG2 ?? '0'}</td>
+                    <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${s.max ?? '100'}</td>
+                    <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${(s.max/2) ?? '50'}</td>
+                    <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px; color:${isFail?'red':'black'}">${s.sum ?? '0'}</td>
+                    <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:1px; min-width:30px; color:red;">${isFail ? (s.secondExam || '-') : '-'}</td>
+                    <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px; min-width:30px">-</td>
+                </tr>
+                <tr>
+                    <td style="border:1px solid #cbd5e1; padding:2px;">امتحان الفصل</td>
+                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.eM1}</td>
+                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.eG1 ?? '0'}</td>
+                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.eG2 ?? '0'}</td>
+                </tr>`;
             }
         });
+
         document.getElementById('resTbody').innerHTML=h;
         const gradeEl = document.getElementById('outGrade');
         const msgArea = document.getElementById('adminMessageArea');
         let msg = "";
+
         if(hasFail) {
             gradeEl.innerText = "لها دور ثانٍ"; gradeEl.className = "status-fail-text";
             document.getElementById('totalRow').style.display="none"; document.getElementById('percentRow').style.display="none";
@@ -676,9 +675,15 @@
         if (schoolSubjects[yr]) {
             Object.keys(schoolSubjects[yr]).forEach(s => {
                 const info = schoolSubjects[yr][s];
-                const div = document.createElement('div'); div.className = "ind-grid";
-                // خانات فارغة تماماً عند الإضافة الجديدة
-                div.innerHTML = `<input type="text" value="${s}" readonly class="sub-name-input"><input type="number" placeholder="0" class="wG1" value=""><input type="number" value="${info.w}" class="wM1" readonly style="background:#eee"><input type="number" placeholder="0" class="eG1" value=""><input type="number" value="${info.e}" class="eM1" readonly style="background:#eee"><input type="number" placeholder="0" class="wG2" value=""><input type="number" value="${info.w}" class="wM2" readonly style="background:#eee"><input type="number" placeholder="0" class="eG2" value=""><input type="number" value="${info.e}" class="eM2" readonly style="background:#eee">`; 
+                const div = document.createElement('div'); 
+                div.className = "ind-grid";
+                div.innerHTML = `
+                    <input type="text" value="${s}" readonly class="sub-name-input"> 
+                    <input type="number" placeholder="أعمال1" class="wG1" value="0"> <input type="number" value="${info.w}" class="wM1" readonly style="background:#eee">
+                    <input type="number" placeholder="امتحان1" class="eG1" value="0"> <input type="number" value="${info.e}" class="eM1" readonly style="background:#eee">
+                    <input type="number" placeholder="أعمال2" class="wG2" value="0"> <input type="number" value="${info.w}" class="wM2" readonly style="background:#eee">
+                    <input type="number" placeholder="امتحان2" class="eG2" value="0"> <input type="number" value="${info.e}" class="eM2" readonly style="background:#eee">
+                `; 
                 con.appendChild(div);
             });
         }
@@ -692,21 +697,53 @@
             const n = div.querySelector('input[type="text"]').value;
             const info = schoolSubjects[yr][n];
             const wg1 = parseFloat(div.querySelector('.wG1').value) || 0;
+            const wm1 = info.w;
             const eg1 = parseFloat(div.querySelector('.eG1').value) || 0;
+            const em1 = info.e;
             const wg2 = parseFloat(div.querySelector('.wG2').value) || 0;
+            const wm2 = info.w;
             const eg2 = parseFloat(div.querySelector('.eG2').value) || 0;
+            const em2 = info.e;
+
             const currentSum = (wg1 + eg1 + wg2 + eg2);
-            const currentMax = (info.w + info.e) * 2;
-            subs[n] = {wG1:wg1, wM1:info.w, eG1:eg1, eM1:info.e, wG2:wg2, wM2:info.w, eG2:eg2, eM2:info.e, sum:currentSum, max:currentMax}; 
-            tG += currentSum; tM += currentMax;
+            const currentMax = (wm1 + em1 + wm2 + em2);
+
+            subs[n] = {wG1:wg1, wM1:wm1, eG1:eg1, eM1:em1, wG2:wg2, wM2:wm2, eG2:eg2, eM2:em2, sum:currentSum, max:currentMax}; 
+            tG += currentSum; 
+            tM += currentMax;
         });
         db.ref('students/'+id).set({name, year:yr, subjects:subs, totalGot:tG, totalMax:tM, percent:((tG/tM)*100).toFixed(1)})
-        .then(()=>alert("تم حفظ بيانات الطالبة بنجاح."));
+        .then(()=>alert("تم رصد وحفظ بيانات الطالبة بنجاح")).catch(err => alert("خطأ: " + err.message));
     }
 </script>
 
-<a href="https://wa.me/218920317335" class="whatsapp-float" id="whatsappBtn" target="_blank" style="position:fixed; bottom:20px; left:20px; background:#25d366; color:#FFF; border-radius:50px; padding:10px 20px; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:10px; z-index:9999;">
-    <i class="fab fa-whatsapp"></i><span>للاستفسار والتواصل</span>
+<style>
+    .whatsapp-float {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background-color: #25d366;
+        color: #FFF;
+        border-radius: 50px;
+        padding: 10px 20px;
+        font-weight: 700;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 9999;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: transform 0.3s ease;
+    }
+    .whatsapp-float:hover { transform: scale(1.05); color: #fff; }
+    .whatsapp-float i { font-size: 20px; }
+    @media print { .whatsapp-float { display: none !important; } }
+</style>
+
+<a href="https://wa.me/218920317335" class="whatsapp-float" id="whatsappBtn" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+    <span>للاستفسار والتواصل</span>
 </a>
 
 </body>
