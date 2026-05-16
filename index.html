@@ -353,6 +353,16 @@
             overflow: visible;
         }
 
+        .delete-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 10;
+        }
+
         @media print {
             .btn, .search-container, #adminPortal, .admin-tabs, .dev-footer-simple, .container::before, .container::after, #backToStatsBtn, .school-header { display: none !important; }
             #resultView { display: block !important; width: 100%; border: none; padding: 0; }
@@ -564,9 +574,21 @@
 
     const schoolSubjects = {
         "خامس": ["التربية الإسلامية", "الحاسوب", "الرياضيات", "العلوم", "الكتابة", "اللغة الإنجليزية", "الاجتماعيات", "اللغة العربية"],
-        "سادس": ["التربية الإسلامية", "الحاسوب", "الرياضيات", "العلوم", "الكتابة", "اللغة الإنجليزية", "الاجتماعيات", "اللغة العربية"],
+        "سادس": ["التربية الإسلامية", "اللغة العربية", "الكتابة", "اللغة الإنجليزية", "الحاسوب", "الالرياضيات", "العلوم", "الاجتماعيات"],
         "سابع": ["التاريخ", "التربية الإسلامية", "الجغرافيا", "الحاسوب", "الرياضيات", "العلوم", "الكتابة", "اللغة الإنجليزية", "اللغة العربية"],
         "ثامن": ["التاريخ", "التربية الإسلامية", "الجغرافيا", "الحاسوب", "الرياضيات", "العلوم", "الكتابة", "اللغة الإنجليزية", "اللغة العربية"]
+    };
+
+    // التوزيع المعتمد للصف السادس من واقع الوثيقة الرسمية
+    const officialWeights60 = {
+        "التربية الإسلامية": { w: 24, e: 36 },
+        "اللغة العربية": { w: 32, e: 48 },
+        "الكتابة": { w: 16, e: 24 },
+        "اللغة الإنجليزية": { w: 32, e: 48 },
+        "الحاسوب": { w: 16, e: 24 },
+        "الرياضيات": { w: 40, e: 60 },
+        "العلوم": { w: 24, e: 36 },
+        "الاجتماعيات": { w: 16, e: 24 }
     };
 
     const officialWeights78 = {
@@ -643,7 +665,10 @@
                 
                 schoolSubjects[yr].forEach(s => { 
                     let defW = 20; let defE = 30;
-                    if((yr === "سابع" || yr === "ثامن") && officialWeights78[s]) {
+                    if(yr === "سادس" && officialWeights60[s]) {
+                        defW = officialWeights60[s].w;
+                        defE = officialWeights60[s].e;
+                    } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[s]) {
                         defW = officialWeights78[s].w;
                         defE = officialWeights78[s].e;
                     }
@@ -659,7 +684,7 @@
             document.getElementById('loadingOverlay').style.display='flex';
             db.ref().update(updates).then(() => {
                 document.getElementById('loadingOverlay').style.display='none';
-                alert(`تم تسجيل ${count} طالبة بنجاح وعمل تهيئة للفصلين المتبقين.`);
+                alert(`تم تسجيل ${count} طالبة بنجاح وعمل تهيئة للفصلين.`);
                 document.getElementById('quickAddArea').value = "";
             });
         }
@@ -680,7 +705,10 @@
             con.innerHTML = "";
             schoolSubjects[data.year].forEach(s => {
                 let defaultW = 20; let defaultE = 30;
-                if((data.year === "سابع" || data.year === "ثامن") && officialWeights78[s]) {
+                if(data.year === "سادس" && officialWeights60[s]) {
+                    defaultW = officialWeights60[s].w;
+                    defaultE = officialWeights60[s].e;
+                } else if((data.year === "سابع" || data.year === "ثامن") && officialWeights78[s]) {
                     defaultW = officialWeights78[s].w;
                     defaultE = officialWeights78[s].e;
                 }
@@ -725,7 +753,10 @@
                 
                 schoolSubjects[yr].forEach(subName => {
                     let dW = 20; let dE = 30;
-                    if((yr === "سابع" || yr === "ثامن") && officialWeights78[subName]) {
+                    if(yr === "سادس" && officialWeights60[subName]) {
+                        dW = officialWeights60[subName].w;
+                        dE = officialWeights60[subName].e;
+                    } else if((yr === "...ثابع" || yr === "ثامن") && officialWeights78[subName]) {
                         dW = officialWeights78[subName].w;
                         dE = officialWeights78[subName].e;
                     }
@@ -774,7 +805,10 @@
                 const wg1 = parseFloat(grid.querySelector('.wG1').value) || 0;
                 
                 let defaultW = 20; let defaultE = 30;
-                if((yr === "سابع" || yr === "ثامن") && officialWeights78[subName]) {
+                if(yr === "سادس" && officialWeights60[subName]) {
+                    defaultW = officialWeights60[subName].w;
+                    defaultE = officialWeights60[subName].e;
+                } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[subName]) {
                     defaultW = officialWeights78[subName].w;
                     defaultE = officialWeights78[subName].e;
                 }
@@ -870,7 +904,10 @@
                 let currentWM1 = s.wM1 ?? 20;
                 let currentEM1 = s.eM1 ?? 30;
                 
-                if((data.year === "سابع" || data.year === "ثامن") && officialWeights78[k]) {
+                if(data.year === "سادس" && officialWeights60[k]) {
+                    currentWM1 = officialWeights60[k].w;
+                    currentEM1 = officialWeights60[k].e;
+                } else if((data.year === "سابع" || data.year === "ثامن") && officialWeights78[k]) {
                     currentWM1 = officialWeights78[k].w;
                     currentEM1 = officialWeights78[k].e;
                 }
@@ -942,7 +979,10 @@
         const con = document.getElementById('subjectsContainer'); con.innerHTML = ""; 
         if (schoolSubjects[yr]) schoolSubjects[yr].forEach(s => {
             let wVal = 20; let eVal = 30;
-            if((yr === "سابع" || yr === "ثامن") && officialWeights78[s]) {
+            if(yr === "سادس" && officialWeights60[s]) {
+                wVal = officialWeights60[s].w;
+                eVal = officialWeights60[s].e;
+            } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[s]) {
                 wVal = officialWeights78[s].w;
                 eVal = officialWeights78[s].e;
             }
@@ -972,7 +1012,10 @@
             const wg1 = parseFloat(div.querySelector('.wG1').value) || 0;
             
             let wDef = 20; let eDef = 30;
-            if((yr === "سابع" || yr === "ثامن") && officialWeights78[n]) {
+            if(yr === "سادس" && officialWeights60[n]) {
+                wDef = officialWeights60[n].w;
+                eDef = officialWeights60[n].e;
+            } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[n]) {
                 wDef = officialWeights78[n].w;
                 eDef = officialWeights78[n].e;
             }
