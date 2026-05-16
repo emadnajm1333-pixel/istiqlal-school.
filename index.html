@@ -640,9 +640,14 @@
                 const isFail = s.sum < (s.max/2);
                 if(isFail) { hasFail=true; failed.push(k); }
                 
-                // جلب القيم المقررة بشكل ديناميكي من قاعدة البيانات لتطابق ما تم رصده في الشهادة تماماً
-                const currentWM1 = s.wM1 ?? 20;
-                const currentEM1 = s.eM1 ?? 30;
+                // هنا الإجبار الذكي للتوزيع لكي يظهر الجديد في الشهادة مباشرة حتى للطالبات القدامى
+                let currentWM1 = s.wM1 ?? 20;
+                let currentEM1 = s.eM1 ?? 30;
+                
+                if((data.year === "سابع" || data.year === "ثامن") && officialWeights78[k]) {
+                    currentWM1 = officialWeights78[k].w;
+                    currentEM1 = officialWeights78[k].e;
+                }
                 
                 h += `
                 <tr>
