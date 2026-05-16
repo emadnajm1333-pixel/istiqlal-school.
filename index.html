@@ -217,21 +217,20 @@
             background: var(--primary);
             color: white;
             padding: 4px 1px;
-            font-size: 9px;
+            font-size: 10px;
             border: 1px solid #fff;
-            line-height: 1.1;
-            word-wrap: break-word;
+            line-height: 1.2;
             vertical-align: middle;
+            text-align: center;
         }
 
         .res-table td {
-            padding: 10px 5px;
+            padding: 8px 4px;
             border: 1px solid #e2e8f0;
             text-align: center;
             font-weight: 900;
             color: #000;
-            font-size: 11px;
-            overflow: hidden;
+            font-size: 12px;
         }
 
         .summary-box {
@@ -304,7 +303,6 @@
 
         .bulk-grid, .ind-grid { 
             display: grid; 
-            grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; 
             gap: 4px; 
             margin-bottom: 5px; 
             align-items: center;
@@ -312,7 +310,6 @@
 
         .bulk-header-labels, #individualHeaderLabels {
             display: grid; 
-            grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
             gap: 4px; 
             font-size: 10px; 
             font-weight: bold; 
@@ -321,25 +318,27 @@
             padding: 5px 0;
         }
 
+        /* تنسيقات ديناميكية لتقسيم الأعمدة بحسب النظام */
+        .grid-style-normal {
+            grid-template-columns: 2.2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+        }
+        .grid-style-period3 {
+            grid-template-columns: 2.2fr 1.2fr 0.8fr 1.2fr 0.8fr 1.2fr 0.8fr;
+        }
+
         .bulk-grid input, .ind-grid input {
             padding: 6px 2px;
             margin-bottom: 0;
             border-radius: 6px;
             font-size: 13px;
             font-weight: 700;
+            text-align: center;
         }
 
-        .bulk-grid input[type="number"]:nth-child(even), 
-        .ind-grid input[type="number"]:nth-child(even) {
-            background: #ffffff;
-            border-color: #94a3b8;
-        }
-
-        .bulk-grid input[type="number"]:nth-child(odd), 
-        .ind-grid input[type="number"]:nth-child(odd) {
-            background: #f1f5f9;
-            color: #64748b;
-            border-color: #e2e8f0;
+        .bulk-grid input[readonly], .ind-grid input[readonly] {
+            background: #f1f5f9 !important;
+            color: #64748b !important;
+            border-color: #e2e8f0 !important;
         }
 
         .sub-name-input {
@@ -349,8 +348,6 @@
             padding-right: 8px !important;
             font-size: 11px !important;
             border: 1px solid #bbf7d0 !important;
-            white-space: nowrap;
-            overflow: visible;
         }
 
         .delete-btn {
@@ -407,31 +404,7 @@
                 <div id="outYear" style="color: var(--accent); font-weight: 800; font-size: 13px; margin-top: 1px;"></div>
             </div>
             
-            <table class="res-table">
-                <thead>
-                    <tr>
-                        <th rowspan="3" style="width: 20%;">المادة</th>
-                        <th colspan="4">درجة الفصلين</th>
-                        <th colspan="6">النتيجة النهائية للتلميذ</th>
-                    </tr>
-                    <tr>
-                        <th rowspan="2">التفاصيل</th>
-                        <th rowspan="2">الدرجة المقررة لكل فصل</th>
-                        <th colspan="2">درجة التلميذ</th>
-                        <th colspan="2">النهايات</th>
-                        <th rowspan="2">مجموع الفصلين</th>
-                        <th rowspan="2" style="padding: 1px; font-size: 9px; min-width: 30px; line-height: 1.1;">امتحان<br>الدور<br>الثاني<br>40%</th>
-                        <th rowspan="2">نتيجة الدور الثاني</th>
-                    </tr>
-                    <tr>
-                        <th>الفصل الأول</th>
-                        <th>الفصل الثاني</th>
-                        <th>كُبرى</th>
-                        <th>صُغرى</th>
-                    </tr>
-                </thead>
-                <tbody id="resTbody"></tbody>
-            </table>
+            <div id="tableWrapper"></div>
 
             <div class="summary-box">
                 <div id="totalRow" style="display:flex; justify-content:space-between; padding:5px 12px; border-bottom:1px solid #e2e8f0; font-size:13px;">
@@ -498,9 +471,7 @@
                 <option value="سابع">سابع</option>
                 <option value="ثامن">ثامن</option>
             </select>
-            <div id="individualHeaderLabels">
-                <span>المادة</span><span>أعمال1</span><span>من</span><span>امتحان1</span><span>من</span><span>أعمال2</span><span>من</span><span>امتحان2</span><span>من</span>
-            </div>
+            <div id="individualHeaderLabels"></div>
             <div id="subjectsContainer"></div>
             <button class="btn" style="background: var(--success); color:white;" onclick="saveToFirebase()">حفظ ورصد الطالبة</button>
         </div>
@@ -573,13 +544,26 @@
     const auth = firebase.auth();
 
     const schoolSubjects = {
-        "خامس": ["التربية الإسلامية", "الحاسوب", "الرياضيات", "العلوم", "الكتابة", "اللغة الإنجليزية", "الاجتماعيات", "اللغة العربية"],
+        "خامس": ["التربية الإسلامية", "اللغة العربية", "الكتابة", "اللغة الإنجليزية", "الحاسوب", "الالرياضيات", "العلوم", "الاجتماعيات"],
         "سادس": ["التربية الإسلامية", "اللغة العربية", "الكتابة", "اللغة الإنجليزية", "الحاسوب", "الرياضيات", "العلوم", "الاجتماعيات"],
         "سابع": ["التاريخ", "التربية الإسلامية", "الجغرافيا", "الحاسوب", "الالرياضيات", "العلوم", "الكتابة", "اللغة الإنجليزية", "اللغة العربية"],
         "ثامن": ["التاريخ", "التربية الإسلامية", "الجغرافيا", "الحاسوب", "الرياضيات", "العلوم", "الكتابة", "اللغة الإنجليزية", "اللغة العربية"]
     };
 
-    // التوزيع المعتمد للصف السادس من واقع الوثيقة الرسمية
+    // أوزان ومحددات الصف الخامس (نظام 3 فترات: 30%، 30%، 40%) من واقع مستند الشهادة الرسمي
+    const officialWeights55 = {
+        "التربية الإسلامية": { p1: 36, p2: 36, p3: 48, max: 120, min: 48 },
+        "اللغة العربية": { p1: 48, p2: 48, p3: 64, max: 160, min: 64 },
+        "الكتابة": { p1: 24, p2: 24, p3: 32, max: 80, min: 32 },
+        "اللغة الإنجليزية": { p1: 36, p2: 36, p3: 48, max: 120, min: 48 },
+        "الحاسوب": { p1: 12, p2: 12, p3: 16, max: 40, min: 16 },
+        "الالرياضيات": { p1: 60, p2: 60, p3: 80, max: 200, min: 80 },
+        "الرياضيات": { p1: 60, p2: 60, p3: 80, max: 200, min: 80 }, // احتياط لحالات الكتابة الإملائية المزدوجة
+        "العلوم": { p1: 36, p2: 36, p3: 48, max: 120, min: 48 },
+        "الاجتماعيات": { p1: 24, p2: 24, p3: 32, max: 80, min: 32 }
+    };
+
+    // التوزيع المعتمد للصف السادس (40 اعمال و60 امتحان مأمنة بالكامل للرياضيات وباقي المواد تفصيلياً)
     const officialWeights60 = {
         "التربية الإسلامية": { w: 24, e: 36 },
         "اللغة العربية": { w: 32, e: 48 },
@@ -587,10 +571,12 @@
         "اللغة الإنجليزية": { w: 32, e: 48 },
         "الحاسوب": { w: 16, e: 24 },
         "الرياضيات": { w: 40, e: 60 },
+        "الالرياضيات": { w: 40, e: 60 },
         "العلوم": { w: 24, e: 36 },
         "الاجتماعيات": { w: 16, e: 24 }
     };
 
+    // التوزيع المعتمد للصفين السابع والثامن
     const officialWeights78 = {
         "التربية الإسلامية": { w: 16, e: 24 },
         "اللغة العربية": { w: 32, e: 48 },
@@ -598,6 +584,7 @@
         "اللغة الإنجليزية": { w: 32, e: 48 },
         "الحاسوب": { w: 16, e: 24 },
         "الرياضيات": { w: 40, e: 60 },
+        "الالرياضيات": { w: 40, e: 60 },
         "العلوم": { w: 32, e: 48 },
         "التاريخ": { w: 16, e: 24 },
         "الجغرافيا": { w: 16, e: 24 }
@@ -664,17 +651,21 @@
                 let totalClassMax = 0;
                 
                 schoolSubjects[yr].forEach(s => { 
-                    let defW = 20; let defE = 30;
-                    if(yr === "سادس" && officialWeights60[s]) {
-                        defW = officialWeights60[s].w;
-                        defE = officialWeights60[s].e;
-                    } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[s]) {
-                        defW = officialWeights78[s].w;
-                        defE = officialWeights78[s].e;
+                    if(yr === "خامس") {
+                        const conf = officialWeights55[s] || { p1: 36, p2: 36, p3: 48, max: 120, min: 48 };
+                        subs[s] = { p1:0, p1M:conf.p1, p2:0, p2M:conf.p2, p3:0, p3M:conf.p3, sum:0, max:conf.max, min:conf.min };
+                        totalClassMax += conf.max;
+                    } else {
+                        let defW = 20; let defE = 30;
+                        if(yr === "سادس" && officialWeights60[s]) {
+                            defW = officialWeights60[s].w; defE = officialWeights60[s].e;
+                        } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[s]) {
+                            defW = officialWeights78[s].w; defE = officialWeights78[s].e;
+                        }
+                        const itemMax = (defW + defE) * 2;
+                        subs[s] = {wG1:0, wM1:defW, eG1:0, eM1:defE, wG2:0, wM2:defW, eG2:0, eM2:defE, sum:0, max:itemMax}; 
+                        totalClassMax += itemMax;
                     }
-                    const itemMax = (defW + defE) * 2;
-                    subs[s] = {wG1:0, wM1:defW, eG1:0, eM1:defE, wG2:0, wM2:defW, eG2:0, eM2:defE, sum:0, max:itemMax}; 
-                    totalClassMax += itemMax;
                 });
                 updates['students/'+id] = { name: name, year: yr, subjects: subs, totalGot: 0, totalMax: totalClassMax, percent: "0.0" };
                 count++;
@@ -701,33 +692,102 @@
             document.getElementById('newStudentID').value = id; 
             document.getElementById('inName').value = data.name;
             document.getElementById('inYear').value = data.year;
+            
+            setupHeaderAndContainerLayout(data.year);
             const con = document.getElementById('subjectsContainer');
             con.innerHTML = "";
+
             schoolSubjects[data.year].forEach(s => {
-                let defaultW = 20; let defaultE = 30;
-                if(data.year === "سادس" && officialWeights60[s]) {
-                    defaultW = officialWeights60[s].w;
-                    defaultE = officialWeights60[s].e;
-                } else if((data.year === "سابع" || data.year === "ثامن") && officialWeights78[s]) {
-                    defaultW = officialWeights78[s].w;
-                    defaultE = officialWeights78[s].e;
-                }
-                const subData = (data.subjects && data.subjects[s]) ? data.subjects[s] : {wG1:0, wM1:defaultW, eG1:0, eM1:defaultE, wG2:0, wM2:defaultW, eG2:0, eM2:defaultE};
                 const div = document.createElement('div');
-                div.className = "ind-grid";
-                div.innerHTML = `
-                    <input type="text" value="${s}" readonly class="sub-name-input">
-                    <input type="number" class="wG1" value="${subData.wG1 || 0}">
-                    <input type="number" class="wM1" value="${defaultW}" readonly>
-                    <input type="number" class="eG1" value="${subData.eG1 || 0}">
-                    <input type="number" class="eM1" value="${defaultE}" readonly>
-                    <input type="number" class="wG2" value="${subData.wG2 || 0}">
-                    <input type="number" class="wM2" value="${defaultW}" readonly>
-                    <input type="number" class="eG2" value="${subData.eG2 || 0}">
-                    <input type="number" class="eM2" value="${defaultE}" readonly>
-                `; 
+                if(data.year === "خامس") {
+                    div.className = "ind-grid grid-style-period3";
+                    const conf = officialWeights55[s] || { p1: 36, p2: 36, p3: 48, max: 120 };
+                    const subData = (data.subjects && data.subjects[s]) ? data.subjects[s] : {p1:0, p2:0, p3:0};
+                    div.innerHTML = `
+                        <input type="text" value="${s}" readonly class="sub-name-input">
+                        <input type="number" class="p1" value="${subData.p1 || 0}">
+                        <input type="number" value="${conf.p1}" readonly>
+                        <input type="number" class="p2" value="${subData.p2 || 0}">
+                        <input type="number" value="${conf.p2}" readonly>
+                        <input type="number" class="p3" value="${subData.p3 || 0}">
+                        <input type="number" value="${conf.p3}" readonly>
+                    `;
+                } else {
+                    div.className = "ind-grid grid-style-normal";
+                    let defaultW = 20; let defaultE = 30;
+                    if(data.year === "سادس" && officialWeights60[s]) {
+                        defaultW = officialWeights60[s].w; defaultE = officialWeights60[s].e;
+                    } else if((data.year === "سابع" || data.year === "ثامن") && officialWeights78[s]) {
+                        defaultW = officialWeights78[s].w; defaultE = officialWeights78[s].e;
+                    }
+                    const subData = (data.subjects && data.subjects[s]) ? data.subjects[s] : {wG1:0, wM1:defaultW, eG1:0, eM1:defaultE, wG2:0, wM2:defaultW, eG2:0, eM2:defaultE};
+                    div.innerHTML = `
+                        <input type="text" value="${s}" readonly class="sub-name-input">
+                        <input type="number" class="wG1" value="${subData.wG1 || 0}">
+                        <input type="number" class="wM1" value="${defaultW}" readonly>
+                        <input type="number" class="eG1" value="${subData.eG1 || 0}">
+                        <input type="number" class="eM1" value="${defaultE}" readonly>
+                        <input type="number" class="wG2" value="${subData.wG2 || 0}">
+                        <input type="number" class="wM2" value="${defaultW}" readonly>
+                        <input type="number" class="eG2" value="${subData.eG2 || 0}">
+                        <input type="number" class="eM2" value="${defaultE}" readonly>
+                    `; 
+                }
                 con.appendChild(div);
             });
+        });
+    }
+
+    function setupHeaderAndContainerLayout(year) {
+        const lbls = document.getElementById('individualHeaderLabels');
+        if(year === "خامس") {
+            lbls.className = "bulk-header-labels grid-style-period3";
+            lbls.innerHTML = `<span>المادة</span><span>الفترة 1</span><span>من</span><span>الفترة 2</span><span>من</span><span>الفترة 3</span><span>من</span>`;
+        } else {
+            lbls.className = "bulk-header-labels grid-style-normal";
+            lbls.innerHTML = `<span>المادة</span><span>أعمال1</span><span>من</span><span>امتحان1</span><span>من</span><span>أعمال2</span><span>من</span><span>امتحان2</span><span>من</span>`;
+        }
+    }
+
+    function autoFillSubjects() {
+        const yr = document.getElementById('inYear').value;
+        setupHeaderAndContainerLayout(yr);
+        const con = document.getElementById('subjectsContainer'); con.innerHTML = ""; 
+        if (schoolSubjects[yr]) schoolSubjects[yr].forEach(s => {
+            const div = document.createElement('div'); 
+            if(yr === "خامس") {
+                div.className = "ind-grid grid-style-period3";
+                const conf = officialWeights55[s] || { p1: 36, p2: 36, p3: 48 };
+                div.innerHTML = `
+                    <input type="text" value="${s}" readonly class="sub-name-input"> 
+                    <input type="number" class="p1">
+                    <input type="number" value="${conf.p1}" readonly>
+                    <input type="number" class="p2">
+                    <input type="number" value="${conf.p2}" readonly>
+                    <input type="number" class="p3">
+                    <input type="number" value="${conf.p3}" readonly>
+                `;
+            } else {
+                div.className = "ind-grid grid-style-normal";
+                let wVal = 20; let eVal = 30;
+                if(yr === "سادس" && officialWeights60[s]) {
+                    wVal = officialWeights60[s].w; eVal = officialWeights60[s].e;
+                } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[s]) {
+                    wVal = officialWeights78[s].w; eVal = officialWeights78[s].e;
+                }
+                div.innerHTML = `
+                    <input type="text" value="${s}" readonly class="sub-name-input"> 
+                    <input type="number" class="wG1">
+                    <input type="number" value="${wVal}" class="wM1" readonly>
+                    <input type="number" class="eG1">
+                    <input type="number" value="${eVal}" class="eM1" readonly>
+                    <input type="number" class="wG2">
+                    <input type="number" value="${wVal}" class="wM2" readonly>
+                    <input type="number" class="eG2">
+                    <input type="number" value="${eVal}" class="eM2" readonly>
+                `;
+            }
+            con.appendChild(div);
         });
     }
 
@@ -746,39 +806,50 @@
                 const s = item.data; const id = item.key;
                 html += `<div class="bulk-row" data-id="${id}">
                     <i class="fas fa-trash delete-btn" onclick="deleteStudent('${id}')"></i>
-                    <div style="font-weight:900; color:var(--primary); margin-bottom:10px;">${s.name} (${id})</div>
-                    <div class="bulk-header-labels" tabindex="-1">
+                    <div style="font-weight:900; color:var(--primary); margin-bottom:10px;">${s.name} (${id})</div>`;
+                
+                if(yr === "خامس") {
+                    html += `<div class="bulk-header-labels grid-style-period3" tabindex="-1">
+                        <span>المادة</span><span>الفترة 1</span><span>من</span><span>الفترة 2</span><span>من</span><span>الفترة 3</span><span>من</span>
+                    </div>`;
+                    schoolSubjects[yr].forEach(subName => {
+                        const conf = officialWeights55[subName] || { p1: 36, p2: 36, p3: 48 };
+                        const subData = (s.subjects && s.subjects[subName]) ? s.subjects[subName] : {p1:"", p2:"", p3:""};
+                        html += `<div class="bulk-grid grid-style-period3" data-subject="${subName}">
+                            <input type="text" value="${subName}" readonly tabindex="-1" class="sub-name-input">
+                            <input type="number" class="p1" value="${subData.p1 ?? ""}"> 
+                            <input type="number" value="${conf.p1}" readonly tabindex="-1">
+                            <input type="number" class="p2" value="${subData.p2 ?? ""}"> 
+                            <input type="number" value="${conf.p2}" readonly tabindex="-1">
+                            <input type="number" class="p3" value="${subData.p3 ?? ""}"> 
+                            <input type="number" value="${conf.p3}" readonly tabindex="-1">
+                        </div>`;
+                    });
+                } else {
+                    html += `<div class="bulk-header-labels grid-style-normal" tabindex="-1">
                         <span>المادة</span><span>أعمال1</span><span>من</span><span>امتحان1</span><span>من</span><span>أعمال2</span><span>من</span><span>امتحان2</span><span>من</span>
                     </div>`;
-                
-                schoolSubjects[yr].forEach(subName => {
-                    let dW = 20; let dE = 30;
-                    if(yr === "سادس" && officialWeights60[subName]) {
-                        dW = officialWeights60[subName].w;
-                        dE = officialWeights60[subName].e;
-                    } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[subName]) {
-                        dW = officialWeights78[subName].w;
-                        dE = officialWeights78[subName].e;
-                    }
-                    const subData = (s.subjects && s.subjects[subName]) ? s.subjects[subName] : {wG1:0, wM1:dW, eG1:0, eM1:dE, wG2:0, wM2:dW, eG2:0, eM2:dE};
-                    
-                    const wg1_val = subData.wG1 ? subData.wG1 : "";
-                    const eg1_val = subData.eG1 ? subData.eG1 : "";
-                    const wg2_val = subData.wG2 ? subData.wG2 : "";
-                    const eg2_val = subData.eG2 ? subData.eG2 : "";
-
-                    html += `<div class="bulk-grid" data-subject="${subName}">
-                        <input type="text" value="${subName}" readonly tabindex="-1" class="sub-name-input">
-                        <input type="number" class="wG1" value="${wg1_val}"> 
-                        <input type="number" class="wM1" value="${dW}" readonly tabindex="-1">
-                        <input type="number" class="eG1" value="${eg1_val}"> 
-                        <input type="number" class="eM1" value="${dE}" readonly tabindex="-1">
-                        <input type="number" class="wG2" value="${wg2_val}"> 
-                        <input type="number" class="wM2" value="${dW}" readonly tabindex="-1">
-                        <input type="number" class="eG2" value="${eg2_val}"> 
-                        <input type="number" class="eM2" value="${dE}" readonly tabindex="-1">
-                    </div>`;
-                });
+                    schoolSubjects[yr].forEach(subName => {
+                        let dW = 20; let dE = 30;
+                        if(yr === "سادس" && officialWeights60[subName]) {
+                            dW = officialWeights60[subName].w; dE = officialWeights60[subName].e;
+                        } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[subName]) {
+                            dW = officialWeights78[subName].w; dE = officialWeights78[subName].e;
+                        }
+                        const subData = (s.subjects && s.subjects[subName]) ? s.subjects[subName] : {wG1:"", eG1:"", wG2:"", eG2:""};
+                        html += `<div class="bulk-grid grid-style-normal" data-subject="${subName}">
+                            <input type="text" value="${subName}" readonly tabindex="-1" class="sub-name-input">
+                            <input type="number" class="wG1" value="${subData.wG1 ?? ""}"> 
+                            <input type="number" value="${dW}" readonly tabindex="-1">
+                            <input type="number" class="eG1" value="${subData.eG1 ?? ""}"> 
+                            <input type="number" value="${dE}" readonly tabindex="-1">
+                            <input type="number" class="wG2" value="${subData.wG2 ?? ""}"> 
+                            <input type="number" value="${dW}" readonly tabindex="-1">
+                            <input type="number" class="eG2" value="${subData.eG2 ?? ""}"> 
+                            <input type="number" value="${dE}" readonly tabindex="-1">
+                        </div>`;
+                    });
+                }
                 html += `</div>`;
             });
             con.innerHTML = html || "<p style='text-align:center;'>لا يوجد طالبات</p>";
@@ -786,10 +857,43 @@
         });
     }
 
-    function deleteStudent(id) {
-        if(confirm("حذف الطالبة نهائياً؟")) {
-            db.ref('students/'+id).remove().then(() => { alert("تم الحذف"); loadBulkStudentsList(); });
-        }
+    function saveToFirebase() {
+        const id = document.getElementById('newStudentID').value; const name = document.getElementById('inName').value; const yr = document.getElementById('inYear').value;
+        if(!id || !name || !yr) return alert("أكمل البيانات");
+        let subs = {}; let tG=0; let tM=0;
+        
+        document.querySelectorAll('#subjectsContainer > div').forEach(div => {
+            const n = div.querySelector('input[type="text"]').value;
+            if(yr === "خامس") {
+                const p1 = parseFloat(div.querySelector('.p1').value) || 0;
+                const p2 = parseFloat(div.querySelector('.p2').value) || 0;
+                const p3 = parseFloat(div.querySelector('.p3').value) || 0;
+                const conf = officialWeights55[n] || { p1: 36, p2: 36, p3: 48, max: 120, min: 48 };
+                
+                const currentSum = (p1 + p2 + p3);
+                subs[n] = { p1, p1M:conf.p1, p2, p2M:conf.p2, p3, p3M:conf.p3, sum:currentSum, max:conf.max, min:conf.min };
+                tG += currentSum; tM += conf.max;
+            } else {
+                const wg1 = parseFloat(div.querySelector('.wG1').value) || 0;
+                let wDef = 20; let eDef = 30;
+                if(yr === "سادس" && officialWeights60[n]) {
+                    wDef = officialWeights60[n].w; eDef = officialWeights60[n].e;
+                } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[n]) {
+                    wDef = officialWeights78[n].w; eDef = officialWeights78[n].e;
+                }
+                const eg1 = parseFloat(div.querySelector('.eG1').value) || 0;
+                const wg2 = parseFloat(div.querySelector('.wG2').value) || 0;
+                const eg2 = parseFloat(div.querySelector('.eG2').value) || 0;
+
+                const currentSum = (wg1 + eg1 + wg2 + eg2);
+                const currentMax = (wDef + eDef) * 2;
+
+                subs[n] = {wG1:wg1, wM1:wDef, eG1:eg1, eM1:eDef, wG2:wg2, wM2:wDef, eG2:eg2, eM2:eDef, sum:currentSum, max:currentMax}; 
+                tG += currentSum; tM += currentMax;
+            }
+        });
+        db.ref('students/'+id).set({name, year:yr, subjects:subs, totalGot:tG, totalMax:tM, percent:((tG/tM)*100).toFixed(1)})
+        .then(()=>alert("تم رصد وحفظ بيانات الطالبة بنجاح")).catch(err => alert("خطأ: " + err.message));
     }
 
     function saveAllBulkData() {
@@ -800,38 +904,46 @@
             const id = row.getAttribute('data-id');
             const name = row.querySelector('div').innerText.split(' (')[0];
             let subs = {}; let tG=0; let tM=0;
+            
             row.querySelectorAll('.bulk-grid').forEach(grid => {
                 const subName = grid.getAttribute('data-subject');
-                const wg1 = parseFloat(grid.querySelector('.wG1').value) || 0;
-                
-                let defaultW = 20; let defaultE = 30;
-                if(yr === "سادس" && officialWeights60[subName]) {
-                    defaultW = officialWeights60[subName].w;
-                    defaultE = officialWeights60[subName].e;
-                } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[subName]) {
-                    defaultW = officialWeights78[subName].w;
-                    defaultE = officialWeights78[subName].e;
+                if(yr === "خامس") {
+                    const p1 = parseFloat(grid.querySelector('.p1').value) || 0;
+                    const p2 = parseFloat(grid.querySelector('.p2').value) || 0;
+                    const p3 = parseFloat(grid.querySelector('.p3').value) || 0;
+                    const conf = officialWeights55[subName] || { p1: 36, p2: 36, p3: 48, max: 120, min: 48 };
+                    
+                    const currentSum = (p1 + p2 + p3);
+                    subs[subName] = { p1, p1M:conf.p1, p2, p2M:conf.p2, p3, p3M:conf.p3, sum:currentSum, max:conf.max, min:conf.min };
+                    tG += currentSum; tM += conf.max;
+                } else {
+                    const wg1 = parseFloat(grid.querySelector('.wG1').value) || 0;
+                    let defaultW = 20; let defaultE = 30;
+                    if(yr === "سادس" && officialWeights60[subName]) {
+                        defaultW = officialWeights60[subName].w; defaultE = officialWeights60[subName].e;
+                    } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[subName]) {
+                        defaultW = officialWeights78[subName].w; defaultE = officialWeights78[subName].e;
+                    }
+                    const eg1 = parseFloat(grid.querySelector('.eG1').value) || 0;
+                    const wg2 = parseFloat(grid.querySelector('.wG2').value) || 0;
+                    const eg2 = parseFloat(grid.querySelector('.eG2').value) || 0;
+
+                    const currentSum = (wg1 + eg1 + wg2 + eg2);
+                    const currentMax = (defaultW + defaultE) * 2;
+
+                    subs[subName] = {wG1:wg1, wM1:defaultW, eG1:eg1, eM1:defaultE, wG2:wg2, wM2:defaultW, eG2:eg2, eM2:defaultE, sum:currentSum, max:currentMax};
+                    tG += currentSum; tM += currentMax;
                 }
-                
-                const wm1 = defaultW;
-                const eg1 = parseFloat(grid.querySelector('.eG1').value) || 0;
-                const em1 = defaultE;
-                
-                const wg2 = parseFloat(grid.querySelector('.wG2').value) || 0;
-                const wm2 = defaultW;
-                const eg2 = parseFloat(grid.querySelector('.eG2').value) || 0;
-                const em2 = defaultE;
-
-                const currentSum = (wg1 + eg1 + wg2 + eg2);
-                const currentMax = (wm1 + em1 + wm2 + em2);
-
-                subs[subName] = {wG1:wg1, wM1:wm1, eG1:eg1, eM1:em1, wG2:wg2, wM2:wm2, eG2:eg2, eM2:em2, sum:currentSum, max:currentMax};
-                tG += currentSum; 
-                tM += currentMax;
             });
             updates['students/'+id] = {name, year:yr, subjects:subs, totalGot:tG, totalMax:tM, percent:((tG/tM)*100).toFixed(1)};
         });
         db.ref().update(updates).then(() => alert("تم الحفظ بنجاح لجميع الطالبات"));
+    }
+
+    function deleteStudent(id) {
+        if(confirm("حذف الطالبة نهائياً؟")) {
+            db.ref('students/'+id).remove().then(() => { alert("تم الحذف"); loadBulkStudentsList(); });
+        }
     }
 
     function loadClassStats() {
@@ -845,7 +957,14 @@
             let rows = "";
             students.forEach(s => {
                 let isFail = false;
-                for(let k in s.subjects) { if(s.subjects[k].sum < (s.subjects[k].max/2)) { isFail = true; break; } }
+                for(let k in s.subjects) {
+                    if(yr === "خامس") {
+                        const conf = officialWeights55[k] || { min: 48 };
+                        if((s.subjects[k].sum || 0) < conf.min) { isFail = true; break; }
+                    } else {
+                        if((s.subjects[k].sum || 0) < ((s.subjects[k].max || 50) / 2)) { isFail = true; break; }
+                    }
+                }
                 if(isFail) failed++; else passed++;
                 rows += `<tr onclick="viewFromStats('${s.id}')" style="cursor:pointer; border-bottom:1px solid #eee;">
                     <td style="padding:10px; font-weight:700; color:var(--primary);">${s.name}</td>
@@ -894,53 +1013,121 @@
         document.getElementById('resultView').style.display='block';
         document.getElementById('outName').innerText = data.name;
         document.getElementById('outYear').innerText = "الصف: " + data.year;
-        let h=""; let failed=[]; let hasFail=false;
-        const sortedKeys = schoolSubjects[data.year] || Object.keys(data.subjects);
         
-        sortedKeys.forEach(k => {
-            if(data.subjects[k]) {
-                const s = data.subjects[k]; 
-                
-                let currentWM1 = s.wM1 ?? 20;
-                let currentEM1 = s.eM1 ?? 30;
-                
-                if(data.year === "سادس" && officialWeights60[k]) {
-                    currentWM1 = officialWeights60[k].w;
-                    currentEM1 = officialWeights60[k].e;
-                } else if((data.year === "سابع" || data.year === "ثامن") && officialWeights78[k]) {
-                    currentWM1 = officialWeights78[k].w;
-                    currentEM1 = officialWeights78[k].e;
-                }
-                
-                const calculatedMax = (currentWM1 + currentEM1) * 2;
-                const calculatedMin = calculatedMax / 2;
-                
-                const isFail = s.sum < calculatedMin;
-                if(isFail) { hasFail=true; failed.push(k); }
-                
-                h += `
-                <tr>
-                    <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${k}</td>
-                    <td style="border:1px solid #cbd5e1; padding:2px;">الأعمال</td>
-                    <td style="border:1px solid #cbd5e1; padding:2px;">${currentWM1}</td>
-                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.wG1 ?? '0'}</td>
-                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.wG2 ?? '0'}</td>
-                    <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${calculatedMax}</td>
-                    <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${calculatedMin}</td>
-                    <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px; color:${isFail?'red':'black'}">${s.sum ?? '0'}</td>
-                    <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:1px; min-width:30px; color:red;">${isFail ? (s.secondExam || '-') : '-'}</td>
-                    <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px; min-width:30px">-</td>
-                </tr>
-                <tr>
-                    <td style="border:1px solid #cbd5e1; padding:2px;">امتحان نهاية الفصل</td>
-                    <td style="border:1px solid #cbd5e1; padding:2px;">${currentEM1}</td>
-                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.eG1 ?? '0'}</td>
-                    <td style="border:1px solid #cbd5e1; padding:2px;">${s.eG2 ?? '0'}</td>
-                </tr>`;
-            }
-        });
+        let wrapper = document.getElementById('tableWrapper');
+        let h = ""; let failed = []; let hasFail = false;
+        const sortedKeys = schoolSubjects[data.year] || Object.keys(data.subjects);
 
-        document.getElementById('resTbody').innerHTML=h;
+        if(data.year === "خامس") {
+            // صياغة وعرض الجدول الخاص بالخامس (مطابق لنموذج الشهادة المكون من 3 فترات)
+            h = `
+            <table class="res-table">
+                <thead>
+                    <tr>
+                        <th style="width:25%;">المواد الدراسية المقررة</th>
+                        <th>الفترة الأولى 30%</th>
+                        <th>الفترة الثانية 30%</th>
+                        <th>الفترة الثالثة 40%</th>
+                        <th>الدرجة الكبرى</th>
+                        <th>الدرجة الصغرى</th>
+                        <th>درجة التلميذ 100%</th>
+                        <th>نتيجة الدور الثاني</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+            
+            sortedKeys.forEach(k => {
+                if(data.subjects[k]) {
+                    const s = data.subjects[k];
+                    const conf = officialWeights55[k] || { p1:36, p2:36, p3:48, max:120, min:48 };
+                    const isFail = (s.sum || 0) < conf.min;
+                    if(isFail) { hasFail = true; failed.push(k); }
+
+                    h += `
+                    <tr>
+                        <td style="text-align:right; padding-right:8px;">${k}</td>
+                        <td>${s.p1 ?? '0'}<br><small style="color:#64748b; font-size:9px;">من ${conf.p1}</small></td>
+                        <td>${s.p2 ?? '0'}<br><small style="color:#64748b; font-size:9px;">من ${conf.p2}</small></td>
+                        <td>${s.p3 ?? '0'}<br><small style="color:#64748b; font-size:9px;">من ${conf.p3}</small></td>
+                        <td style="color:var(--primary);">${conf.max}</td>
+                        <td style="color:var(--accent);">${conf.min}</td>
+                        <td style="color:${isFail?'red':'black'}">${s.sum ?? '0'}</td>
+                        <td>-</td>
+                    </tr>`;
+                }
+            });
+            h += `</tbody></table>`;
+            wrapper.innerHTML = h;
+
+        } else {
+            // صياغة وعرض الجدول الخاص بالصفوف سادس وسابع وثامن (نظام الفصلين)
+            h = `
+            <table class="res-table">
+                <thead>
+                    <tr>
+                        <th rowspan="3" style="width: 20%;">المادة</th>
+                        <th colspan="4">درجة الفصلين</th>
+                        <th colspan="6">النتيجة النهائية للتلميذ</th>
+                    </tr>
+                    <tr>
+                        <th rowspan="2">التفاصيل</th>
+                        <th rowspan="2">الدرجة المقررة لكل فصل</th>
+                        <th colspan="2">درجة التلميذ</th>
+                        <th colspan="2">النهايات</th>
+                        <th rowspan="2">مجموع الفصلين</th>
+                        <th rowspan="2" style="padding: 1px; font-size: 9px; min-width: 30px; line-height: 1.1;">امتحان<br>الدور<br>الثاني<br>40%</th>
+                        <th rowspan="2">نتيجة الدور الثاني</th>
+                    </tr>
+                    <tr>
+                        <th>الفصل الأول</th>
+                        <th>الفصل الثاني</th>
+                        <th>كُبرى</th>
+                        <th>صُغرى</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            sortedKeys.forEach(k => {
+                if(data.subjects[k]) {
+                    const s = data.subjects[k]; 
+                    let currentWM1 = s.wM1 ?? 20; let currentEM1 = s.eM1 ?? 30;
+                    
+                    if(data.year === "سادس" && officialWeights60[k]) {
+                        currentWM1 = officialWeights60[k].w; currentEM1 = officialWeights60[k].e;
+                    } else if((data.year === "سابع" || data.year === "ثامن") && officialWeights78[k]) {
+                        currentWM1 = officialWeights78[k].w; currentEM1 = officialWeights78[k].e;
+                    }
+                    
+                    const calculatedMax = (currentWM1 + currentEM1) * 2;
+                    const calculatedMin = calculatedMax / 2;
+                    const isFail = s.sum < calculatedMin;
+                    if(isFail) { hasFail=true; failed.push(k); }
+                    
+                    h += `
+                    <tr>
+                        <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${k}</td>
+                        <td style="border:1px solid #cbd5e1; padding:2px;">الأعمال</td>
+                        <td style="border:1px solid #cbd5e1; padding:2px;">${currentWM1}</td>
+                        <td style="border:1px solid #cbd5e1; padding:2px;">${s.wG1 ?? '0'}</td>
+                        <td style="border:1px solid #cbd5e1; padding:2px;">${s.wG2 ?? '0'}</td>
+                        <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${calculatedMax}</td>
+                        <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px;">${calculatedMin}</td>
+                        <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px; color:${isFail?'red':'black'}">${s.sum ?? '0'}</td>
+                        <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:1px; min-width:30px; color:red;">-</td>
+                        <td rowspan="2" style="vertical-align:middle; border:1px solid #cbd5e1; padding:2px; min-width:30px">-</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #cbd5e1; padding:2px;">امتحان نهاية الفصل</td>
+                        <td style="border:1px solid #cbd5e1; padding:2px;">${currentEM1}</td>
+                        <td style="border:1px solid #cbd5e1; padding:2px;">${s.eG1 ?? '0'}</td>
+                        <td style="border:1px solid #cbd5e1; padding:2px;">${s.eG2 ?? '0'}</td>
+                    </tr>`;
+                }
+            });
+            h += `</tbody></table>`;
+            wrapper.innerHTML = h;
+        }
+
         const gradeEl = document.getElementById('outGrade');
         const msgArea = document.getElementById('adminMessageArea');
         let msg = "";
@@ -972,72 +1159,6 @@
           confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#1e3a8a', '#b45309', '#059669', '#FFD700'] });
           if (Date.now() < end) requestAnimationFrame(frame);
         }());
-    }
-
-    function autoFillSubjects() {
-        const yr = document.getElementById('inYear').value;
-        const con = document.getElementById('subjectsContainer'); con.innerHTML = ""; 
-        if (schoolSubjects[yr]) schoolSubjects[yr].forEach(s => {
-            let wVal = 20; let eVal = 30;
-            if(yr === "سادس" && officialWeights60[s]) {
-                wVal = officialWeights60[s].w;
-                eVal = officialWeights60[s].e;
-            } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[s]) {
-                wVal = officialWeights78[s].w;
-                eVal = officialWeights78[s].e;
-            }
-            const div = document.createElement('div'); 
-            div.className = "ind-grid";
-            div.innerHTML = `
-                <input type="text" value="${s}" readonly class="sub-name-input"> 
-                <input type="number" class="wG1">
-                <input type="number" value="${wVal}" class="wM1" readonly>
-                <input type="number" class="eG1">
-                <input type="number" value="${eVal}" class="eM1" readonly>
-                <input type="number" class="wG2">
-                <input type="number" value="${wVal}" class="wM2" readonly>
-                <input type="number" class="eG2">
-                <input type="number" value="${eVal}" class="eM2" readonly>
-            `; 
-            con.appendChild(div);
-        });
-    }
-
-    function saveToFirebase() {
-        const id = document.getElementById('newStudentID').value; const name = document.getElementById('inName').value; const yr = document.getElementById('inYear').value;
-        if(!id || !name || !yr) return alert("أكمل البيانات");
-        let subs = {}; let tG=0; let tM=0;
-        document.querySelectorAll('#subjectsContainer > div').forEach(div => {
-            const n = div.querySelector('input[type="text"]').value;
-            const wg1 = parseFloat(div.querySelector('.wG1').value) || 0;
-            
-            let wDef = 20; let eDef = 30;
-            if(yr === "سادس" && officialWeights60[n]) {
-                wDef = officialWeights60[n].w;
-                eDef = officialWeights60[n].e;
-            } else if((yr === "سابع" || yr === "ثامن") && officialWeights78[n]) {
-                wDef = officialWeights78[n].w;
-                eDef = officialWeights78[n].e;
-            }
-
-            const wm1 = wDef;
-            const eg1 = parseFloat(div.querySelector('.eG1').value) || 0;
-            const em1 = eDef;
-            
-            const wg2 = parseFloat(div.querySelector('.wG2').value) || 0;
-            const wm2 = wDef;
-            const eg2 = parseFloat(div.querySelector('.eG2').value) || 0;
-            const em2 = eDef;
-
-            const currentSum = (wg1 + eg1 + wg2 + eg2);
-            const currentMax = (wm1 + em1 + wm2 + em2);
-
-            subs[n] = {wG1:wg1, wM1:wm1, eG1:eg1, eM1:em1, wG2:wg2, wM2:wm2, eG2:eg2, eM2:em2, sum:currentSum, max:currentMax}; 
-            tG += currentSum; 
-            tM += currentMax;
-        });
-        db.ref('students/'+id).set({name, year:yr, subjects:subs, totalGot:tG, totalMax:tM, percent:((tG/tM)*100).toFixed(1)})
-        .then(()=>alert("تم رصد وحفظ بيانات الطالبة بنجاح")).catch(err => alert("خطأ: " + err.message));
     }
 </script>
 
