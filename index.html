@@ -25,76 +25,282 @@
             --border: #cbd5e1;
         }
 
-        * { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        body { margin: 0; background: var(--bg); color: var(--text); padding: 5px; min-height: 100vh; overflow-x: hidden; }
-        .container { max-width: 1000px; margin: 2px auto; position: relative; }
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            padding: 5px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2px auto;
+            position: relative;
+        }
         
         #loadingOverlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.8); z-index: 9999; justify-content: center; align-items: center; flex-direction: column;
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
-        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
         .container::before, .container::after {
-            content: ""; position: absolute; top: 0; bottom: 0; width: 6px;
-            background: var(--primary); z-index: 0; border-radius: 10px; opacity: 0.8;
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: var(--primary);
+            z-index: 0;
+            border-radius: 10px;
+            opacity: 0.8;
         }
+
         .container::before { right: -12px; }
         .container::after { left: -12px; }
 
         .main-card { 
-            background: var(--card); border-radius: 20px; padding: 12px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border);
-            position: relative; z-index: 1; width: 100%;
+            background: var(--card);
+            border-radius: 20px;
+            padding: 12px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            position: relative;
+            z-index: 1;
+            width: 100%;
         }
         
         .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center;
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
         }
-        .modal-content {
-            background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 350px;
-            text-align: center; box-shadow: 0 15px 30px rgba(0,0,0,0.2); animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-content h3 { margin-top: 0; color: var(--primary); font-size: 18px; }
-        .modal-content input { margin: 15px 0; border: 2px solid #e2e8f0; text-align: center; }
 
-        .admin-tabs { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
-        .tab-btn { flex: 1; min-width: 100px; padding: 10px; border-radius: 10px; border: none; background: #e2e8f0; font-weight: 700; cursor: pointer; color: #64748b; }
-        .tab-btn.active { background: var(--primary); color: white; }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .modal-content input {
+            margin: 15px 0;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            background: #e2e8f0;
+            font-weight: 700;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
 
         .admin-section { display: none; }
         .admin-section.active { display: block; }
 
-        input, select, textarea { width: 100%; padding: 8px; border-radius: 10px; border: 2px solid var(--border); background: #f8fafc; outline: none; font-size: 14px; margin-bottom: 8px; text-align: center; }
-        .btn { width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; }
-        .btn-primary { background: var(--primary); color: white; }
-        
-        #resultView { display: none; margin-top: 5px; padding: 15px; border-radius: 12px; background: #fff; }
-        
-        .res-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); margin-bottom: 5px; }
-        .res-table th { 
-            background: var(--primary); color: white; padding: 4px 1px; font-size: 9px; border: 1px solid #fff;
-            line-height: 1.1; word-wrap: break-word; vertical-align: middle;
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            background: #f8fafc;
+            outline: none;
+            font-size: 14px;
+            margin-bottom: 8px;
+            text-align: center;
         }
-        .res-table td { padding: 10px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: 900; color: #000; font-size: 11px; overflow: hidden; }
 
-        .summary-box { margin-top: 0; border: 2px solid var(--primary); background: #f8fafc; border-radius: 0 0 10px 10px; }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        #resultView {
+            display: none;
+            margin-top: 5px;
+            padding: 15px;
+            border-radius: 12px;
+            background: #fff;
+        }
+        
+        .res-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid var(--border);
+            margin-bottom: 5px;
+        }
+
+        .res-table th { 
+            background: var(--primary);
+            color: white;
+            padding: 4px 1px;
+            font-size: 9px;
+            border: 1px solid #fff;
+            line-height: 1.1;
+            word-wrap: break-word;
+            vertical-align: middle;
+        }
+
+        .res-table td {
+            padding: 10px 5px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+            font-weight: 900;
+            color: #000;
+            font-size: 11px;
+            overflow: hidden;
+        }
+
+        .summary-box {
+            margin-top: 0;
+            border: 2px solid var(--primary);
+            background: #f8fafc;
+            border-radius: 0 0 10px 10px;
+        }
+
         .status-pass-text { color: var(--success) !important; font-weight: 900; }
         .status-fail-text { color: var(--danger) !important; font-weight: 900; }
         .grade-success-color { color: var(--success) !important; font-weight: 900; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-        .stat-box { padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .stat-title { font-size: 12px; color: #64748b; margin-bottom: 5px; display: block; font-weight: 900; }
-        .stat-value { font-size: 22px; color: var(--primary); display: block; font-weight: 900; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
 
-        .dev-footer-simple { text-align: center; margin-top: 15px; padding: 8px; color: #000; font-weight: 700; font-size: 13px; border-top: 1px solid #e2e8f0; }
-        .wish-text-inline { color: #e11d48; font-weight: 800; font-size: 11px; margin-right: 5px; vertical-align: middle; }
+        .stat-box {
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
 
-        .bulk-row { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); position: relative; }
+        .stat-title {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 5px;
+            display: block;
+            font-weight: 900;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            color: var(--primary);
+            display: block;
+            font-weight: 900;
+        }
+
+        .dev-footer-simple {
+            text-align: center;
+            margin-top: 15px;
+            padding: 8px;
+            color: #000;
+            font-weight: 700;
+            font-size: 13px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .wish-text-inline {
+            color: #e11d48;
+            font-weight: 800;
+            font-size: 11px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        .bulk-row {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            position: relative;
+        }
 
         .bulk-grid, .ind-grid { 
             display: grid; 
@@ -277,8 +483,10 @@
             <input type="text" id="inName" placeholder="الاسم الرباعي">
             <select id="inYear" onchange="autoFillSubjects()">
                 <option value="">-- الصف --</option>
-                <option value="خامس">خامس</option><option value="سادس">سادس</option>
-                <option value="سابع">سابع</option><option value="ثامن">ثامن</option>
+                <option value="خامس">خامس</option>
+                <option value="سادس">سادس</option>
+                <option value="سابع">سابع</option>
+                <option value="ثامن">ثامن</option>
             </select>
             <div id="individualHeaderLabels">
                 <span>المادة</span><span>أعمال1</span><span>من</span><span>امتحان1</span><span>من</span><span>أعمال2</span><span>من</span><span>امتحان2</span><span>من</span>
@@ -290,8 +498,10 @@
         <div id="bulkTab" class="admin-section">
              <select id="bulkSelectYear" onchange="loadBulkStudentsList()">
                 <option value="">-- اختر الصف لجلب الطالبات --</option>
-                <option value="خامس">خامس</option><option value="سادس">سادس</option>
-                <option value="سابع">سابع</option><option value="ثامن">ثامن</option>
+                <option value="خامس">خامس</option>
+                <option value="سادس">سادس</option>
+                <option value="سابع">سابع</option>
+                <option value="ثامن">ثامن</option>
             </select>
             <div id="bulkStudentsContainer"></div>
             <button id="saveAllBulkBtn" class="btn" style="display:none; background:var(--success); color:white; margin-top:15px;" onclick="saveAllBulkData()">حفظ الكل</button>
@@ -303,8 +513,10 @@
                 <p style="text-align:center; font-size:12px; font-weight:bold; color:#475569;">اكتب (الاسم - الرقم الوطني) كل طالبة في سطر</p>
                 <select id="quickAddYear">
                     <option value="">-- اختر الصف --</option>
-                    <option value="خامس">خامس</option><option value="سادس">سادس</option>
-                    <option value="سابع">سابع</option><option value="ثامن">ثامن</option>
+                    <option value="خامس">خامس</option>
+                    <option value="سادس">سادس</option>
+                    <option value="سابع">سابع</option>
+                    <option value="ثامن">ثامن</option>
                 </select>
                 <textarea id="quickAddArea" rows="12" style="text-align:right;" placeholder="مثال:&#10;نورة محمد سالم - 120050607080&#10;مريم علي الفيتوري - 120060504030"></textarea>
                 <button class="btn btn-primary" onclick="processQuickAdd()"><i class="fas fa-save"></i> حفظ الطالبات في المنظومة</button>
@@ -314,8 +526,10 @@
         <div id="statsTab" class="admin-section">
             <select id="statsSelectYear" onchange="loadClassStats()">
                 <option value="">-- اختر الصف --</option>
-                <option value="خامس">خامس</option><option value="سادس">سادس</option>
-                <option value="سابع">سابع</option><option value="ثامن">ثامن</option>
+                <option value="خامس">خامس</option>
+                <option value="سادس">سادس</option>
+                <option value="سابع">سابع</option>
+                <option value="ثامن">ثامن</option>
             </select>
             <div id="statsContent" style="display:none;">
                 <div class="stats-grid">
@@ -325,7 +539,6 @@
                     <div class="stat-box"><span class="stat-title">النسبة</span><span id="passPercent" class="stat-value">0%</span></div>
                 </div>
                 <table style="width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden;">
-                    <thead style="background:var(--primary); color:white;"><tr><th style="padding:10px;">الاسم</th><th style="padding:10px;">الحالة</th></tr></thead>
                     <tbody id="statsTbody"></tbody>
                 </table>
             </div>
@@ -476,10 +689,14 @@
                 div.className = "ind-grid";
                 div.innerHTML = `
                     <input type="text" value="${s}" readonly class="sub-name-input">
-                    <input type="number" class="wG1" value="${subData.wG1 || 0}"> <input type="number" class="wM1" value="${subData.wM1 || defaultW}" readonly>
-                    <input type="number" class="eG1" value="${subData.eG1 || 0}"> <input type="number" class="eM1" value="${subData.eM1 || defaultE}" readonly>
-                    <input type="number" class="wG2" value="${subData.wG2 || 0}"> <input type="number" class="wM2" value="${subData.wM2 || defaultW}" readonly>
-                    <input type="number" class="eG2" value="${subData.eG2 || 0}"> <input type="number" class="eM2" value="${subData.eM2 || defaultE}" readonly>
+                    <input type="number" class="wG1" value="${subData.wG1 || 0}">
+                    <input type="number" class="wM1" value="${subData.wM1 || defaultW}" readonly>
+                    <input type="number" class="eG1" value="${subData.eG1 || 0}">
+                    <input type="number" class="eM1" value="${subData.eM1 || defaultE}" readonly>
+                    <input type="number" class="wG2" value="${subData.wG2 || 0}">
+                    <input type="number" class="wM2" value="${subData.wM2 || defaultW}" readonly>
+                    <input type="number" class="eG2" value="${subData.eG2 || 0}">
+                    <input type="number" class="eM2" value="${subData.eM2 || defaultE}" readonly>
                 `; 
                 con.appendChild(div);
             });
@@ -502,7 +719,10 @@
                 html += `<div class="bulk-row" data-id="${id}">
                     <i class="fas fa-trash delete-btn" onclick="deleteStudent('${id}')"></i>
                     <div style="font-weight:900; color:var(--primary); margin-bottom:10px;">${s.name} (${id})</div>
-                    <div class="bulk-header-labels" tabindex="-1"><span>المادة</span><span>أعمال1</span><span>من</span><span>امتحان1</span><span>من</span><span>أعمال2</span><span>من</span><span>امتحان2</span><span>من</span></div>`;
+                    <div class="bulk-header-labels" tabindex="-1">
+                        <span>المادة</span><span>أعمال1</span><span>من</span><span>امتحان1</span><span>من</span><span>أعمال2</span><span>من</span><span>امتحان2</span><span>من</span>
+                    </div>`;
+                
                 schoolSubjects[yr].forEach(subName => {
                     let dW = 20; let dE = 30;
                     if((yr === "سابع" || yr === "ثامن") && officialWeights78[subName]) {
@@ -518,13 +738,13 @@
 
                     html += `<div class="bulk-grid" data-subject="${subName}">
                         <input type="text" value="${subName}" readonly tabindex="-1" class="sub-name-input">
-                        <input type="number" class="wG1" value="${wg1_val}" placeholder="0"> 
+                        <input type="number" class="wG1" value="${wg1_val}"> 
                         <input type="number" class="wM1" value="${subData.wM1 || dW}" readonly tabindex="-1">
-                        <input type="number" class="eG1" value="${eg1_val}" placeholder="0"> 
+                        <input type="number" class="eG1" value="${eg1_val}"> 
                         <input type="number" class="eM1" value="${subData.eM1 || dE}" readonly tabindex="-1">
-                        <input type="number" class="wG2" value="${wg2_val}" placeholder="0"> 
+                        <input type="number" class="wG2" value="${wg2_val}"> 
                         <input type="number" class="wM2" value="${subData.wM2 || dW}" readonly tabindex="-1">
-                        <input type="number" class="eG2" value="${eg2_val}" placeholder="0"> 
+                        <input type="number" class="eG2" value="${eg2_val}"> 
                         <input type="number" class="eM2" value="${subData.eM2 || dE}" readonly tabindex="-1">
                     </div>`;
                 });
@@ -730,10 +950,14 @@
             div.className = "ind-grid";
             div.innerHTML = `
                 <input type="text" value="${s}" readonly class="sub-name-input"> 
-                <input type="number" placeholder="أعمال1" class="wG1"> <input type="number" value="${wVal}" class="wM1" readonly>
-                <input type="number" placeholder="امتحان1" class="eG1"> <input type="number" value="${eVal}" class="eM1" readonly>
-                <input type="number" placeholder="أعمال2" class="wG2"> <input type="number" value="${wVal}" class="wM2" readonly>
-                <input type="number" placeholder="امتحان2" class="eG2"> <input type="number" value="${eVal}" class="eM2" readonly>
+                <input type="number" class="wG1">
+                <input type="number" value="${wVal}" class="wM1" readonly>
+                <input type="number" class="eG1">
+                <input type="number" value="${eVal}" class="eM1" readonly>
+                <input type="number" class="wG2">
+                <input type="number" value="${wVal}" class="wM2" readonly>
+                <input type="number" class="eG2">
+                <input type="number" value="${eVal}" class="eM2" readonly>
             `; 
             con.appendChild(div);
         });
