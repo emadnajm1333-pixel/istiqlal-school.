@@ -245,12 +245,13 @@
         .res-table-period3 th {
             font-weight: bold;
             color: black;
-            font-size: 9px;
+            font-size: 11px;
+            background-color: #f5f5f5; /* لون خلفية خفيف للعناوين كالمستند */
         }
 
         .res-table-period3 td {
             color: black;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         /* هيدر الفترة مع تقسيماته الفرعية */
@@ -304,7 +305,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        .stat-title {
+        .stats-title {
             font-size: 12px;
             color: #64748b;
             margin-bottom: 5px;
@@ -403,6 +404,11 @@
             cursor: pointer;
             font-size: 16px;
             z-index: 10;
+        }
+
+        /* أسطر فارغة تجميلية بأسفل الجدول للتطابق الورقي */
+        .res-table-period3 .empty-row td {
+            height: 32px;
         }
 
         @media print {
@@ -1064,42 +1070,27 @@
         const sortedKeys = schoolSubjects[data.year] || Object.keys(data.subjects);
 
         if(data.year === "خامس") {
-            // صياغة وعرض الجدول الخاص بالخامس (تصميم مطابق للشهادة الورقية بالكامل)
+            // صياغة وعرض الجدول الخاص بالخامس (تصميم مطابق للشهادة الورقية بالكامل - مع الغاء عمود الحصص)
             h = `
             <table class="res-table res-table-period3">
                 <thead>
                     <tr>
-                        <th style="width:25%;" rowspan="2">المواد الدراسية المقررة</th>
-                        <th>
-                            <div class="period-title">الفترة الأولى</div>
-                            <div class="period-sub-headers">                     
-                        <div class="sub-header-item" style="border:none;">الدرجة الكبرى</div>
-                        <div class="sub-header-item">درجة التلميذ</div>
-                            </div>
-                        </th>
-                        <th>
-                            <div class="period-title">الفترة الثانية</div>
-                            <div class="period-sub-headers">                       
-                                <div class="sub-header-item" style="border:none;">الدرجة الكبرى</div>
-                                <div class="sub-header-item">درجة التلميذ</div>
-                            </div>
-                        </th>
-                        <th>
-                            <div class="period-title">الفترة الثالثة</div>
-                            <div class="period-sub-headers">
-                                <div class="sub-header-item" style="border:none;">الدرجة الكبرى</div>
-                                <div class="sub-header-item">درجة التلميذ</div>
-                            </div>
-                        </th>
-                        <th colspan="2">النتيجة النهائية 100%</th>
+                        <th style="width:25%; font-weight:bold;" rowspan="2">المواد الدراسية المقررة</th>
+                        <th colspan="2">الفترة الأولى <br> 30%</th>
+                        <th colspan="2">الفترة الثانية <br> 30%</th>
+                        <th colspan="2">الفترة الثالثة <br> 40%</th>
+                        <th colspan="3">النتيجة النهائية 100%</th>
                     </tr>
                     <tr>
-                        <th style="background:#e2e8f0; color:black; font-size:8px;">%30</th>
-                        <th style="background:#e2e8f0; color:black; font-size:8px;">%30</th>
-                        <th style="background:#e2e8f0; color:black; font-size:8px;">%40</th>
-                        <th style="background:var(--primary);">الدرجة الكبرى</th>
-                        <th style="background:var(--primary);">الدرجة الصغرى</th>
-                        <th style="background:var(--primary);">درجة التلميذ</th>
+                        <th>الدرجة الكبرى</th>
+                        <th>درجة التلميذ</th>
+                        <th>الدرجة الكبرى</th>
+                        <th>درجة التلميذ</th>
+                        <th>الدرجة الكبرى</th>
+                        <th>درجة التلميذ</th>
+                        <th>الدرجة الكبرى</th>
+                        <th>الدرجة الصغرى</th>
+                        <th>درجة التلميذ</th>
                     </tr>
                 </thead>
                 <tbody>`;
@@ -1113,31 +1104,28 @@
 
                     h += `
                     <tr>
-                        <td style="text-align:right; padding-right:8px; font-weight:bold;">${k}</td>
-                        <td style="padding:0;">
-                            <div style="display:grid; grid-template-columns:1fr 1fr; border:none;">
-                                <div style="border-right:1px solid black; padding:6px 0;">${s.p1 ?? '0'}</div>
-                                <div>${conf.p1}</div>
-                            </div>
-                        </td>
-                        <td style="padding:0;">
-                            <div style="display:grid; grid-template-columns:1fr 1fr; border:none;">
-                                <div style="border-right:1px solid black; padding:6px 0;">${s.p2 ?? '0'}</div>
-                                <div>${conf.p2}</div>
-                            </div>
-                        </td>
-                        <td style="padding:0;">
-                            <div style="display:grid; grid-template-columns:1fr 1fr; border:none;">
-                                <div style="border-right:1px solid black; padding:6px 0;">${s.p3 ?? '0'}</div>
-                                <div>${conf.p3}</div>
-                            </div>
-                        </td>
+                        <td style="text-align:right; padding-right:10px; font-weight:bold;">${k}</td>
+                        <td>${conf.p1}</td>
+                        <td>${s.p1 ?? '0'}</td>
+                        <td>${conf.p2}</td>
+                        <td>${s.p2 ?? '0'}</td>
+                        <td>${conf.p3}</td>
+                        <td>${s.p3 ?? '0'}</td>
+                        <td>${conf.max}</td>
                         <td style="color:var(--accent);">${conf.min}</td>
-                        <td style="color:${isFail?'red':'black'}; font-weight:bold; font-size:12px;">${s.sum ?? '0'}</td>
+                        <td style="color:${isFail?'red':'black'}; font-weight:bold; font-size:13px;">${s.sum ?? '0'}</td>
                     </tr>`;
                 }
             });
-            h += `</tbody></table>`;
+            
+            // أسطر فارغة إضافية أسفل الجدول تماماً كما في الصورة الأصلية للشهادة
+            h += `
+                <tr class="empty-row"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr class="empty-row"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr class="empty-row"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr class="empty-row"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr class="empty-row"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            </tbody></table>`;
             wrapper.innerHTML = h;
 
         } else {
