@@ -214,94 +214,64 @@
             margin-bottom: 5px;
         }
         
-        .res-table {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid var(--border);
-            margin-bottom: 5px;
+        /* إجبار كافة جداول الشهادات على الانضباط الكامل داخل مساحة الإطار */
+        .res-table, .res-table-period3 {
+            width: 100% !important;
+            table-layout: fixed; /* يجبر الأعمدة الكثيرة جداً على الانكماش داخل مساحة الشاشة دون خروج */
         }
 
-        .res-table th { 
-            background: var(--primary);
-            color: white;
-            padding: 2px 1px;
-            font-size: 9px;
-            border: 1px solid #fff;
+        .res-table th, .res-table td, .res-table-period3 th, .res-table-period3 td {
+            border: 1px solid #cbd5e1 !important;
+            padding: 3px 1px !important;
             line-height: 1.1;
             vertical-align: middle;
             text-align: center;
+            word-wrap: break-word; /* يمنع النصوص الطويلة من تمديد الجدول خارج الشاشة */
         }
 
-        .res-table td {
-            padding: 6px 3px;
-            border: 1px solid #e2e8f0;
-            text-align: center;
-            font-weight: 900;
-            color: #000;
-            font-size: 11px;
+        .res-table th, .res-table-period3 th {
+            font-weight: bold;
+            color: black;
+            font-size: 8px !important; /* حجم خط صغير ومناسب لمنع البروز الجانبي */
+            background-color: #f5f5f5;
         }
 
-               /* إجبار كافة جداول الشهادات على الانضباط الكامل داخل مساحة الإطار */
-        .res-table, .res-table-period3 {
-    width: 100% !important;
-    table-layout: fixed;
-    border-collapse: collapse;
-}
+        .res-table td, .res-table-period3 td {
+            color: black;
+            font-size: 9px !important; /* حجم خط الدرجات ليتناسب عمودياً مع الشاشات والموبايل */
+        }
 
-.res-table th, .res-table td, .res-table-period3 th, .res-table-period3 td {
-    border: 1px solid #cbd5e1 !important;
-    padding: 1px 0px !important;
-    line-height: 1.0;
-    vertical-align: middle;
-    text-align: center;
-    white-space: normal;
-    word-break: break-all;
-}
+        /* هيدر الفترة مع تقسيماته الفرعية */
+        .period-header-wrapper {
+            display: grid;
+            grid-template-rows: 1fr auto;
+            border: none;
+            padding: 0;
+        }
 
-.res-table th, .res-table-period3 th {
-    font-weight: bold;
-    color: black;
-    font-size: 7px !important;
-    background-color: #f5f5f5;
-}
+        .period-title {
+            padding: 2px;
+            border-bottom: 1px solid white;
+        }
 
-.res-table td, .res-table-period3 td {
-    color: black;
-    font-size: 8px !important;
-}
+        .period-sub-headers {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border: none;
+        }
 
-/* هيدر الفترة مع تقسيماته الفرعية */
-.period-header-wrapper {
-    display: grid;
-    grid-template-rows: 1fr auto;
-    border: none;
-    padding: 0;
-}
+        .sub-header-item {
+            padding: 2px;
+            border-right: 1px solid white;
+            font-size: 8px;
+        }
 
-.period-title {
-    padding: 2px;
-    border-bottom: 1px solid white;
-}
-
-.period-sub-headers {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    border: none;
-}
-
-.sub-header-item {
-    padding: 2px;
-    border-right: 1px solid white;
-    font-size: 8px;
-}
-
-.summary-box {
-    margin-top: 0;
-    border: 2px solid var(--primary);
-    background: #f8fafc;
-    border-radius: 0 0 10px 10px;
-}
-
+        .summary-box {
+            margin-top: 0;
+            border: 2px solid var(--primary);
+            background: #f8fafc;
+            border-radius: 0 0 10px 10px;
+        }
 
         .status-pass-text { color: var(--success) !important; font-weight: 900; }
         .status-fail-text { color: var(--danger) !important; font-weight: 900; }
