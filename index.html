@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+٥<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -214,31 +214,58 @@
             margin-bottom: 5px;
         }
         
-        /* إجبار كافة جداول الشهادات على الانضباط الكامل داخل مساحة الإطار */
-        .res-table, .res-table-period3 {
-            width: 100% !important;
-            table-layout: fixed; /* يجبر الأعمدة الكثيرة جداً على الانكماش داخل مساحة الشاشة دون خروج */
+        .res-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid var(--border);
+            margin-bottom: 5px;
         }
 
-        .res-table th, .res-table td, .res-table-period3 th, .res-table-period3 td {
-            border: 1px solid #cbd5e1 !important;
+        .res-table th { 
+            background: var(--primary);
+            color: white;
+            padding: 2px 1px;
+            font-size: 9px;
+            border: 1px solid #fff;
+            line-height: 1.1;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .res-table td {
+            padding: 6px 3px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+            font-weight: 900;
+            color: #000;
+            font-size: 11px;
+        }
+
+        /* تنسيقات الجدول المخصص للصف الخامس المعدلة للانضباط بالطول وداخل الإطار تماماً */
+        .res-table-period3 {
+            width: 100% !important;
+            table-layout: fixed; /* يجبر الأعمدة الكثيرة على الانكماش داخل مساحة الكنتينر */
+        }
+
+        .res-table-period3 th, .res-table-period3 td {
+            border: 1px solid black !important;
             padding: 3px 1px !important;
             line-height: 1.1;
             vertical-align: middle;
             text-align: center;
-            word-wrap: break-word; /* يمنع النصوص الطويلة من تمديد الجدول خارج الشاشة */
+            word-wrap: break-word; /* يمنع النصوص من تمديد الجدول للخارج */
         }
 
-        .res-table th, .res-table-period3 th {
+        .res-table-period3 th {
             font-weight: bold;
             color: black;
-            font-size: 8px !important; /* حجم خط صغير ومناسب لمنع البروز الجانبي */
+            font-size: 8px !important; /* حجم متناسق للخط ليمنع البروز الجانبي */
             background-color: #f5f5f5;
         }
 
-        .res-table td, .res-table-period3 td {
+        .res-table-period3 td {
             color: black;
-            font-size: 9px !important; /* حجم خط الدرجات ليتناسب عمودياً مع الشاشات والموبايل */
+            font-size: 9px !important; /* حجم الدرجات ليتناسب عمودياً مع الشاشات والموبايل */
         }
 
         /* هيدر الفترة مع تقسيماته الفرعية */
@@ -1112,7 +1139,7 @@
             <table class="res-table">
                 <thead>
                     <tr>
-                        <th rowspan="3" style="width: 14%;">المادة</th>
+                        <th rowspan="3" style="width: 20%;">المادة</th>
                         <th colspan="4">درجة الفصلين</th>
                         <th colspan="6">النتيجة النهائية للتلميذ</th>
                     </tr>
@@ -1240,3 +1267,4 @@
 
 </body>
 </html>
+ 
